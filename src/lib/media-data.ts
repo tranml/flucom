@@ -1,4 +1,5 @@
 import { Media, LessonSet, Course } from "../types";
+import path from "path";
 
 export const media: Media[] = [
   {
@@ -7,7 +8,7 @@ export const media: Media[] = [
     slug: "bubbas-food-audio",
     url: "https://res.cloudinary.com/dqssqzt3y/video/upload/v1751030255/Bubbas_Food_Audio_awhs6z.mp3",
     lessonSetId: "1",
-    order: 1,   
+    order: 1,
     createdAt: "2025-06-29T00:00:00.000Z",
     updatedAt: "2025-06-29T00:00:00.000Z",
   },
@@ -44,7 +45,7 @@ export const lessonSets: LessonSet[] = [
   },
 ];
 
-export const courses = [
+export const courses: Course[] = [
   {
     id: "1",
     title: "Original English",
@@ -85,6 +86,12 @@ export const getLessonSetTitle = (lessonSetId: string) => {
 export const getCourseTitleFromMedia = (media: Media) => {
   const lessonSet = lessonSets.find((ls) => ls.id === media.lessonSetId);
   if (!lessonSet) return undefined;
-  
+
   return courses.find((course) => course.id === lessonSet.courseId)?.title;
+};
+
+export const getMediaType = (media: Media) => {
+  const videoExtensions = ["mp4"];
+
+  return videoExtensions.includes(path.extname(media.url)) ? "video" : "audio";
 };
