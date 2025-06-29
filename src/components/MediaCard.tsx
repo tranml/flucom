@@ -1,5 +1,4 @@
-
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Media } from "../types";
 
@@ -10,6 +9,7 @@ import {
 } from "../lib/media-data";
 
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { Link } from "expo-router";
 
 export default function MediaCard({ media }: { media: Media }) {
   const mediaType = getMediaType(media);
@@ -35,10 +35,14 @@ export default function MediaCard({ media }: { media: Media }) {
         </View>
 
         {mediaType === "video" && (
-          <MaterialIcons name="play-circle" size={24} color="black" />
+          <Link href="/media-player" asChild>
+            <MaterialIcons name="play-circle" size={32} color="black" />
+          </Link>
         )}
         {mediaType === "audio" && (
-          <MaterialIcons name="volume-up" size={24} color="black" />
+          <Link href="/media-player" asChild>
+            <MaterialIcons name="volume-up" size={32} color="black" />
+          </Link>
         )}
       </View>
     </View>
