@@ -91,7 +91,7 @@ export const getCourseTitleFromMedia = (media: Media) => {
 };
 
 export const getMediaType = (media: Media) => {
-  const videoExtensions = ["mp4"];
+  const videoExtensions = [".mp4"];
 
   return videoExtensions.includes(path.extname(media.url)) ? "video" : "audio";
 };
