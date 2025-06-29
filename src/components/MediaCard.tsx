@@ -1,12 +1,18 @@
+
 import { View, Text, StyleSheet } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Media } from "../types";
 
-import { getCourseTitleFromMedia, getLessonSetTitle } from "../lib/media-data";
+import {
+  getCourseTitleFromMedia,
+  getLessonSetTitle,
+  getMediaType,
+} from "../lib/media-data";
 
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-export default function AudioCard({ media }: { media: Media }) {
+export default function MediaCard({ media }: { media: Media }) {
+  const mediaType = getMediaType(media);
   return (
     <View style={styles.card}>
       <Text style={styles.lessonTitle}>{media.title}</Text>
@@ -25,10 +31,15 @@ export default function AudioCard({ media }: { media: Media }) {
 
       <View style={styles.row}>
         <View style={styles.badge}>
-          <Text style={styles.badgeText}>audio</Text>
+          <Text style={styles.badgeText}>{mediaType}</Text>
         </View>
 
-        <MaterialIcons name="volume-up" size={24} color="#666" />
+        {mediaType === "video" && (
+          <MaterialIcons name="play-circle" size={24} color="black" />
+        )}
+        {mediaType === "audio" && (
+          <MaterialIcons name="volume-up" size={24} color="black" />
+        )}
       </View>
     </View>
   );
