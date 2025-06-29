@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 import { Stack } from "expo-router";
 
-export default function App() {
+export default function HomeScreen() {
   return (
     <View>
       <Text>Welcome to Flucom</Text>
