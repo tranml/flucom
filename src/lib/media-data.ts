@@ -81,3 +81,10 @@ export const getCourseTitle = (courseId: string) => {
 export const getLessonSetTitle = (lessonSetId: string) => {
   return lessonSets.find((lessonSet) => lessonSet.id === lessonSetId)?.title;
 };
+
+export const getCourseTitleFromMedia = (media: Media) => {
+  const lessonSet = lessonSets.find((ls) => ls.id === media.lessonSetId);
+  if (!lessonSet) return undefined;
+  
+  return courses.find((course) => course.id === lessonSet.courseId)?.title;
+};
