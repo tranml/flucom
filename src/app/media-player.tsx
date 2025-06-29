@@ -8,7 +8,7 @@ const videoSource =
 
 export default function MediaPlayerScreen() {
   const mediaPlayer = useVideoPlayer(videoSource, (player) => {
-    player.showNowPlayingNotification = true,
+    player.showNowPlayingNotification = true;
     player.play();
   });
 
