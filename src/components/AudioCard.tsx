@@ -2,11 +2,15 @@ import { View, Text, StyleSheet } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Media } from "../types";
 
+import { getCourseTitle, getLessonSetTitle } from "../lib/media-data";
+
 export default function AudioCard({ media }: { media: Media }) {
   return (
     <View style={styles.card}>
       <Text style={styles.lessonTitle}>{media.title}</Text>
-      <Text style={styles.lessonSetTitle}>{media.lessonSetId}</Text>
+      <Text style={styles.lessonSetTitle}>
+        {getLessonSetTitle(media.lessonSetId)}
+      </Text>
 
       <View style={styles.row}>
         <View style={styles.badge}>
@@ -27,7 +31,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
     minWidth: 300,
-    gap: 4
+    gap: 4,
   },
   lessonTitle: {
     fontSize: 14,
@@ -46,6 +50,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     gap: 8,
+    marginTop: 8,
   },
   badge: {
     backgroundColor: "#f5f5f5",
