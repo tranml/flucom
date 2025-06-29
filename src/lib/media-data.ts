@@ -1,35 +1,4 @@
-export type Media = {
-  id: string;
-  title: string;
-  subtitle?: string;
-  slug: string;
-  url: string;
-  lessonSetId: string;
-  order: number;
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type LessonSet = {
-  id: string;
-  title: string;
-  subtitle?: string;
-  slug: string;
-  courseId: string;
-  order: number;
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type Course = {
-  id: string;
-  title: string;
-  subtitle?: string;
-  slug: string;
-  order: number;
-  createdAt: string;
-  updatedAt: string;
-};
+import { Media, LessonSet, Course } from "../types";
 
 export const media: Media[] = [
   {
@@ -104,3 +73,11 @@ export const courses = [
     updatedAt: "2025-06-29T00:00:00.000Z",
   },
 ];
+
+export const getCourseTitle = (courseId: string) => {
+  return courses.find((course) => course.id === courseId)?.title;
+};
+
+export const getLessonSetTitle = (lessonSetId: string) => {
+  return lessonSets.find((lessonSet) => lessonSet.id === lessonSetId)?.title;
+};
