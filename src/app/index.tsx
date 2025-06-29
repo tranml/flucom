@@ -11,6 +11,8 @@ export default function HomeScreen() {
         <FlatList
           data={media}
           renderItem={({ item }) => <MediaCard media={item} />}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={{ gap: 16 }}
         />
         <Stack.Screen name="index" options={{ headerShown: false }} />
       </View>
