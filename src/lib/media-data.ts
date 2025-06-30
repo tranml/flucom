@@ -18,11 +18,22 @@ export const media: Media[] = [
     slug: "hidden-y-sounds-part-4-of-4",
     url: "https://res.cloudinary.com/dqssqzt3y/video/upload/v1750664615/unit-4--part-4-of-4_aowxmp.mp4",
     lessonSetId: "2",
+    order: 4,
+    createdAt: "2025-06-29T00:00:00.000Z",
+    updatedAt: "2025-06-29T00:00:00.000Z",
+  },
+  {
+    id: "3",
+    title: "Hidden Y Sounds (Part 1 of 4)",
+    slug: "hidden-y-sounds-part-1-of-4",
+    url: "https://res.cloudinary.com/dqssqzt3y/video/upload/v1749436156/unit-4--part-1-of-3_npievd.mp4",
+    lessonSetId: "2",
     order: 1,
     createdAt: "2025-06-29T00:00:00.000Z",
     updatedAt: "2025-06-29T00:00:00.000Z",
   },
 ];
+
 
 export const lessonSets: LessonSet[] = [
   {

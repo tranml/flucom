@@ -10,9 +10,64 @@ import {
 
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Link } from "expo-router";
+import * as FileSystem from "expo-file-system";
+import { useEffect, useState } from "react";
 
 export default function MediaCard({ media }: { media: Media }) {
   const mediaType = getMediaType(media);
+
+  const [localMediaPath, setLocalMediaPath] = useState<string>("");
+  const [downloadProgress, setDownloadProgress] = useState<number>(0);
+
+  useEffect(() => {
+    isDownloaded(media).then((isDownloaded) => {
+      if (isDownloaded) {
+        setLocalMediaPath(getLocalMediaPath(media));
+      }
+    });
+  }, [media]);
+
+  const downloadMedia = async () => {
+    console.log("downloading media");
+
+    const downloadResumable = FileSystem.createDownloadResumable(
+      media.url,
+      FileSystem.documentDirectory + media.id + ".mp4",
+      {},
+      (downloadProgress) => {
+        const progress =
+          downloadProgress.totalBytesWritten /
+          downloadProgress.totalBytesExpectedToWrite;
+        setDownloadProgress(progress * 100);
+      }
+    );
+
+    try {
+      const result = await downloadResumable.downloadAsync();
+      console.log("Finish downloading to", result?.uri);
+      setLocalMediaPath(result?.uri || "");
+    } catch (error) {
+      console.error("error downloading media", error);
+    }
+  };
+
+  const getLocalMediaPath = (media: Media) => {
+    return FileSystem.documentDirectory + media.id + ".mp4";
+  };
+
+  const isDownloaded = async (media: Media) => {
+    const path = getLocalMediaPath(media);
+    const fileInfo = await FileSystem.getInfoAsync(path);
+    return fileInfo.exists && fileInfo.size > 0;
+  };
+
+  const deleteMedia = async (media: Media) => {
+    const path = getLocalMediaPath(media);
+    await FileSystem.deleteAsync(path, { idempotent: true });
+    setLocalMediaPath("");
+    setDownloadProgress(0);
+  };
+
   return (
     <View style={styles.card}>
       <Text style={styles.lessonTitle}>{media.title}</Text>
@@ -33,15 +88,40 @@ export default function MediaCard({ media }: { media: Media }) {
         <View style={styles.badge}>
           <Text style={styles.badgeText}>{mediaType}</Text>
         </View>
+        {!localMediaPath ? (
+          <View style={styles.row}>
+            {downloadProgress > 0 ? (
+              <View style={styles.downloadProgress}>
+                <Text style={styles.downloadProgressText}>
+                  {downloadProgress.toFixed(0)}%
+                </Text>
+              </View>
+            ) : (
+              <MaterialIcons
+                name="cloud-download"
+                size={32}
+                color="black"
+                onPress={downloadMedia}
+              />
+            )}
+          </View>
+        ) : (
+          <Ionicons
+            name="trash-bin-sharp"
+            size={24}
+            color="#dd0000"
+            onPress={() => deleteMedia(media)}
+          />
+        )}
 
-        {mediaType === "video" && (
+        {mediaType === "video" && localMediaPath && (
           <Link href="/media-player" asChild>
-            <MaterialIcons name="play-circle" size={32} color="black" />
+            <MaterialIcons name="play-circle" size={32} color="green" />
           </Link>
         )}
-        {mediaType === "audio" && (
+        {mediaType === "audio" && localMediaPath && (
           <Link href="/media-player" asChild>
-            <MaterialIcons name="volume-up" size={32} color="black" />
+            <MaterialIcons name="volume-up" size={32} color="green" />
           </Link>
         )}
       </View>
@@ -84,6 +164,17 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   badgeText: {
+    fontSize: 10,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  downloadProgress: {
+    backgroundColor: "#f5f5f5",
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  downloadProgressText: {
     fontSize: 10,
     fontWeight: "bold",
     color: "#333",
