@@ -17,6 +17,7 @@ export default function MediaCard({ media }: { media: Media }) {
   const mediaType = getMediaType(media);
 
   const [localMediaPath, setLocalMediaPath] = useState<string>("");
+  const [downloadProgress, setDownloadProgress] = useState<number>(0);
 
   useEffect(() => {
     isDownloaded(media).then((isDownloaded) => {
@@ -32,7 +33,13 @@ export default function MediaCard({ media }: { media: Media }) {
     const downloadResumable = FileSystem.createDownloadResumable(
       media.url,
       FileSystem.documentDirectory + media.id + ".mp4",
-      {}
+      {},
+      (downloadProgress) => {
+        const progress =
+          downloadProgress.totalBytesWritten /
+          downloadProgress.totalBytesExpectedToWrite;
+        setDownloadProgress(progress * 100);
+      }
     );
 
     try {
@@ -75,12 +82,22 @@ export default function MediaCard({ media }: { media: Media }) {
           <Text style={styles.badgeText}>{mediaType}</Text>
         </View>
         {!localMediaPath ? (
-          <MaterialIcons
-            name="cloud-download"
-            size={32}
-            color="black"
-            onPress={downloadMedia}
-          />
+          <View style={styles.row}>
+            {downloadProgress > 0 ? (
+              <View style={styles.downloadProgress}>
+                <Text style={styles.downloadProgressText}>
+                  {downloadProgress.toFixed(2)}%
+                </Text>
+              </View>
+            ) : (
+              <MaterialIcons
+                name="cloud-download"
+                size={32}
+                color="black"
+                onPress={downloadMedia}
+              />
+            )}
+          </View>
         ) : (
           <Ionicons
             name="trash-bin-sharp"
@@ -140,6 +157,17 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   badgeText: {
+    fontSize: 10,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  downloadProgress: {
+    backgroundColor: "#f5f5f5",
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  downloadProgressText: {
     fontSize: 10,
     fontWeight: "bold",
     color: "#333",
