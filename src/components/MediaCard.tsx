@@ -61,6 +61,13 @@ export default function MediaCard({ media }: { media: Media }) {
     return fileInfo.exists && fileInfo.size > 0;
   };
 
+  const deleteMedia = async (media: Media) => {
+    const path = getLocalMediaPath(media);
+    await FileSystem.deleteAsync(path, { idempotent: true });
+    setLocalMediaPath("");
+    setDownloadProgress(0);
+  };
+
   return (
     <View style={styles.card}>
       <Text style={styles.lessonTitle}>{media.title}</Text>
@@ -86,7 +93,7 @@ export default function MediaCard({ media }: { media: Media }) {
             {downloadProgress > 0 ? (
               <View style={styles.downloadProgress}>
                 <Text style={styles.downloadProgressText}>
-                  {downloadProgress.toFixed(2)}%
+                  {downloadProgress.toFixed(0)}%
                 </Text>
               </View>
             ) : (
@@ -103,7 +110,7 @@ export default function MediaCard({ media }: { media: Media }) {
             name="trash-bin-sharp"
             size={24}
             color="#dd0000"
-            onPress={downloadMedia}
+            onPress={() => deleteMedia(media)}
           />
         )}
 
