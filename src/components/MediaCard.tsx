@@ -115,12 +115,12 @@ export default function MediaCard({ media }: { media: Media }) {
         )}
 
         {mediaType === "video" && localMediaPath && (
-          <Link href="/media-player" asChild>
+          <Link href={`/player/${media.id}`} asChild>
             <MaterialIcons name="play-circle" size={32} color="green" />
           </Link>
         )}
         {mediaType === "audio" && localMediaPath && (
-          <Link href="/media-player" asChild>
+          <Link href={`/player/${media.id}`} asChild>
             <MaterialIcons name="volume-up" size={32} color="green" />
           </Link>
         )}

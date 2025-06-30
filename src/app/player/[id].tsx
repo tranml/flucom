@@ -1,24 +1,26 @@
-import { View, Text } from "react-native";
+import { View } from "react-native";
 import { Stack } from "expo-router";
-import { useVideoPlayer, VideoView } from "expo-video";
-import MediaPlayer from "../components/MediaPlayer";
+import { useVideoPlayer } from "expo-video";
+import MediaPlayer from "../../components/MediaPlayer";
 
 import { useEventListener } from "expo";
-import { Media } from "../types";
 import * as FileSystem from "expo-file-system";
 import { useEffect, useState } from "react";
 import { ActivityIndicator } from "react-native";
-import { media } from "../lib/media-data";
+import { media } from "../../lib/media-data";
 
-const media1 = media[1];
+import { useLocalSearchParams } from "expo-router";
 
 export default function MediaPlayerScreen() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const theMedia = media.find((m) => m.id === id);
+
   const [mediaSource, setMediaSource] = useState<string>("");
 
   const mediaPlayer = useVideoPlayer(mediaSource, (player) => {
     player.showNowPlayingNotification = true;
     player.timeUpdateEventInterval = 0.5;
-    // player.play();
+    player.play();
   });
 
   useEventListener(mediaPlayer, "timeUpdate", (event) => {
@@ -26,13 +28,13 @@ export default function MediaPlayerScreen() {
   });
 
   useEffect(() => {
-    const mediaPath = getLocalMediaPath(media1);
+    const mediaPath = getLocalMediaPath(id);
     console.log("mediaPath", mediaPath);
     setMediaSource(mediaPath);
-  }, [media1]);
+  }, [id]);
 
-  const getLocalMediaPath = (media: Media) => {
-    return FileSystem.documentDirectory + media.id + ".mp4";
+  const getLocalMediaPath = (id: string) => {
+    return FileSystem.documentDirectory + id + ".mp4";
   };
 
   if (!mediaSource) {
@@ -46,7 +48,7 @@ export default function MediaPlayerScreen() {
   return (
     <View>
       <MediaPlayer mediaPlayer={mediaPlayer} />
-      <Stack.Screen options={{ title: "Media Player" }} />
+      <Stack.Screen options={{ title: theMedia?.title }} />
     </View>
   );
 }
