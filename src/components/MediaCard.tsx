@@ -10,9 +10,28 @@ import {
 
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Link } from "expo-router";
+import * as FileSystem from "expo-file-system";
 
 export default function MediaCard({ media }: { media: Media }) {
   const mediaType = getMediaType(media);
+
+  const downloadMedia = async () => {
+    console.log("downloading media");
+
+    const downloadResumable = FileSystem.createDownloadResumable(
+      media.url,
+      FileSystem.documentDirectory + media.id + ".mp4",
+      {}
+    );
+
+    try {
+      const result = await downloadResumable.downloadAsync();
+      console.log("Finish downloading to", result?.uri);
+    } catch (error) {
+      console.error("error downloading media", error);
+    }
+  };
+
   return (
     <View style={styles.card}>
       <Text style={styles.lessonTitle}>{media.title}</Text>
@@ -34,7 +53,14 @@ export default function MediaCard({ media }: { media: Media }) {
           <Text style={styles.badgeText}>{mediaType}</Text>
         </View>
 
-        {mediaType === "video" && (
+        <MaterialIcons
+          name="cloud-download"
+          size={32}
+          color="black"
+          onPress={downloadMedia}
+        />
+
+        {mediaType === "video" &&  (
           <Link href="/media-player" asChild>
             <MaterialIcons name="play-circle" size={32} color="black" />
           </Link>
