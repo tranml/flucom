@@ -2,14 +2,13 @@ import { View, Text } from "react-native";
 import { Stack } from "expo-router";
 import { useVideoPlayer, VideoView } from "expo-video";
 import MediaPlayer from "../components/MediaPlayer";
-import { useEvent, useEventListener } from "expo";
-import { useEffect } from "react";
+import { useEventListener } from "expo";
+import { media} from "../lib/media-data";
 
-const videoSource =
-  "https://res.cloudinary.com/dqssqzt3y/video/upload/v1750664615/unit-4--part-4-of-4_aowxmp.mp4";
+const mediaSource = media[1].url;
 
 export default function MediaPlayerScreen() {
-  const mediaPlayer = useVideoPlayer(videoSource, (player) => {
+  const mediaPlayer = useVideoPlayer(mediaSource, (player) => {
     player.showNowPlayingNotification = true;
     player.timeUpdateEventInterval = 0.5;
     // player.play();
