@@ -3,7 +3,7 @@ import { Stack } from "expo-router";
 import { useVideoPlayer } from "expo-video";
 import MediaPlayer from "../../components/MediaPlayer";
 
-import { useEventListener } from "expo";
+import { useEvent, useEventListener } from "expo";
 import * as FileSystem from "expo-file-system";
 import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator } from "react-native";
@@ -32,6 +32,10 @@ export default function MediaPlayerScreen() {
     player.showNowPlayingNotification = true;
     player.timeUpdateEventInterval = 0.5;
     // player.play();
+  });
+
+  const { isPlaying } = useEvent(mediaPlayer, "playingChange", {
+    isPlaying: mediaPlayer.playing,
   });
 
   const lastStoredTimeRef = useRef<number>(0);
@@ -165,36 +169,58 @@ export default function MediaPlayerScreen() {
 
       {/* Phase 2: Range controls buttons */}
       <View style={{ padding: 16, gap: 12 }}>
-        <Text style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center' }}>
+        <Text style={{ fontSize: 16, fontWeight: "bold", textAlign: "center" }}>
           {getRangeDisplayText()}
         </Text>
-        
-        <TouchableOpacity
-          style={{
-            backgroundColor: isRangeButtonDisabled() ? '#ccc' : '#007AFF',
-            padding: 12,
-            borderRadius: 8,
-            alignItems: 'center'
-          }}
-          onPress={handleRangeButtonPress}
-          disabled={isRangeButtonDisabled()}
-        >
-          <Text style={{ color: 'white', fontWeight: 'bold' }}>
-            {getRangeButtonText()}
-          </Text>
-        </TouchableOpacity>
 
+        {isRangeMode ? (
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#007AFF",
+              padding: 12,
+              borderRadius: 8,
+              alignItems: "center",
+            }}
+            onPress={() => {
+              if (isPlaying) {
+                mediaPlayer.pause();
+                mediaPlayer.currentTime = rangeStart ?? 0;
+              } else {
+                mediaPlayer.play();
+              }
+            }}
+          >
+            <Text style={{ color: "white", fontWeight: "bold" }}>
+              {isPlaying ? "Restart" : "Play"}
+            </Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={{
+              backgroundColor: isRangeButtonDisabled() ? "#ccc" : "#007AFF",
+              padding: 12,
+              borderRadius: 8,
+              alignItems: "center",
+            }}
+            onPress={handleRangeButtonPress}
+            // disabled={isRangeButtonDisabled()}
+          >
+            <Text style={{ color: "white", fontWeight: "bold" }}>
+              {getRangeButtonText()}
+            </Text>
+          </TouchableOpacity>
+        )}
         {isRangeMode && (
           <TouchableOpacity
             style={{
-              backgroundColor: '#FF3B30',
+              backgroundColor: "#FF3B30",
               padding: 12,
               borderRadius: 8,
-              alignItems: 'center'
+              alignItems: "center",
             }}
             onPress={handleResetRange}
           >
-            <Text style={{ color: 'white', fontWeight: 'bold' }}>
+            <Text style={{ color: "white", fontWeight: "bold" }}>
               Reset Range
             </Text>
           </TouchableOpacity>
