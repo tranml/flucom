@@ -21,7 +21,6 @@ export default function MediaPlayerScreen() {
 
   const [mediaSource, setMediaSource] = useState<string>("");
 
-  // Phase 1: Range management
   const [rangeStart, setRangeStart] = useState<number | null>(null);
   const [rangeEnd, setRangeEnd] = useState<number | null>(null);
   const [isRangeMode, setIsRangeMode] = useState<boolean>(false);
@@ -31,7 +30,6 @@ export default function MediaPlayerScreen() {
   const mediaPlayer = useVideoPlayer(mediaSource, (player) => {
     player.showNowPlayingNotification = true;
     player.timeUpdateEventInterval = 0.5;
-    // player.play();
   });
 
   const { isPlaying } = useEvent(mediaPlayer, "playingChange", {
@@ -40,23 +38,18 @@ export default function MediaPlayerScreen() {
 
   const lastStoredTimeRef = useRef<number>(0);
 
-  // Phase 1: Validation logic for range selection
   const isCurrentTimeValidForPointB = (): boolean => {
     if (!rangeStart) return false;
-    return currentTime > rangeStart + 1; // At least 1 second difference
+    return currentTime > rangeStart + 1;
   };
 
-  // Phase 2: Button logic and state transitions
   const handleRangeButtonPress = () => {
     if (!isSettingPointB) {
-      // Setting point A
       setRangeStart(currentTime);
       setIsSettingPointB(true);
     } else {
-      // Setting point B
       if (isCurrentTimeValidForPointB()) {
         setRangeEnd(currentTime);
-        // setIsRangeMode(true);
         setIsSettingPointB(false);
       }
     }
@@ -64,7 +57,7 @@ export default function MediaPlayerScreen() {
 
   const handlePlayRange = () => {
     if (rangeStart !== null && rangeEnd !== null) {
-      setIsRangeMode(true); // Only set to true when actually playing
+      setIsRangeMode(true);
       mediaPlayer.currentTime = rangeStart;
       mediaPlayer.play();
     }
@@ -95,21 +88,11 @@ export default function MediaPlayerScreen() {
     return `Range: ${formatTime(rangeStart)} - ${formatTime(rangeEnd)}`;
   };
 
-  // Phase 3: Simple video playback control
   const handleTimeUpdate = (event: any) => {
     const time = event.currentTime;
     setCurrentTime(time);
 
-    // Phase 3: Exit range mode if time goes out of bounds
     if (isRangeMode && rangeStart !== null && rangeEnd !== null) {
-      // if (time < rangeStart || time > rangeEnd) {
-      //   // Silent exit from range mode
-      //   setRangeStart(null);
-      //   setRangeEnd(null);
-      //   setIsRangeMode(false);
-      //   setIsSettingPointB(false);
-      // }
-
       if (time >= rangeEnd) {
         mediaPlayer.currentTime = rangeStart;
         mediaPlayer.play();
@@ -118,9 +101,6 @@ export default function MediaPlayerScreen() {
       if (time < rangeStart - 2) {
         handleResetRange();
       }
-
-      // mediaPlayer.pause();
-      // mediaPlayer.currentTime = rangeStart;
     }
 
     const timeSinceLastStore = time - lastStoredTimeRef.current;
@@ -132,20 +112,6 @@ export default function MediaPlayerScreen() {
   };
 
   useEventListener(mediaPlayer, "timeUpdate", handleTimeUpdate);
-
-  // useEventListener(mediaPlayer, "timeUpdate", (event) => {
-  //   const time = event.currentTime;
-
-  //   // Phrase 2: Button logic and state transitions > Update current time
-  //   setCurrentTime(time);
-
-  //   const timeSinceLastStore = time - lastStoredTimeRef.current;
-
-  //   if (timeSinceLastStore < 5) return;
-
-  //   asStoreData("last-stored-time--media-" + id, time.toString());
-  //   lastStoredTimeRef.current = time;
-  // });
 
   useEffect(() => {
     const mediaPath = getLocalMediaPath(id);
@@ -176,7 +142,6 @@ export default function MediaPlayerScreen() {
     <View style={{ flex: 1 }}>
       <MediaPlayer mediaPlayer={mediaPlayer} />
 
-      {/* Phase 2: Range controls buttons */}
       <View style={{ padding: 16, gap: 12 }}>
         <Text style={{ fontSize: 16, fontWeight: "bold", textAlign: "center" }}>
           {getRangeDisplayText()}
@@ -229,8 +194,6 @@ export default function MediaPlayerScreen() {
               alignItems: "center",
             }}
             onPress={() => {
-              // mediaPlayer.pause();
-              // mediaPlayer.currentTime = rangeStart ?? 0;
               handleResetRange();
             }}
           >
