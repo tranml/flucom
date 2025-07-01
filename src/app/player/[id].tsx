@@ -89,13 +89,25 @@ export default function MediaPlayerScreen() {
 
     // Phase 3: Exit range mode if time goes out of bounds
     if (isRangeMode && rangeStart !== null && rangeEnd !== null) {
-      if (time < rangeStart || time > rangeEnd) {
-        // Silent exit from range mode
-        setRangeStart(null);
-        setRangeEnd(null);
-        setIsRangeMode(false);
-        setIsSettingPointB(false);
+      // if (time < rangeStart || time > rangeEnd) {
+      //   // Silent exit from range mode
+      //   setRangeStart(null);
+      //   setRangeEnd(null);
+      //   setIsRangeMode(false);
+      //   setIsSettingPointB(false);
+      // }
+
+      if (time >= rangeEnd) {
+        mediaPlayer.pause();
+        mediaPlayer.currentTime = rangeStart;
       }
+
+      if (time < rangeStart - 2) {
+        handleResetRange();
+      }
+
+      // mediaPlayer.pause();
+      // mediaPlayer.currentTime = rangeStart;
     }
 
     const timeSinceLastStore = time - lastStoredTimeRef.current;
