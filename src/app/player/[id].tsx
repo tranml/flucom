@@ -56,9 +56,17 @@ export default function MediaPlayerScreen() {
       // Setting point B
       if (isCurrentTimeValidForPointB()) {
         setRangeEnd(currentTime);
-        setIsRangeMode(true);
+        // setIsRangeMode(true);
         setIsSettingPointB(false);
       }
+    }
+  };
+
+  const handlePlayRange = () => {
+    if (rangeStart !== null && rangeEnd !== null) {
+      setIsRangeMode(true); // Only set to true when actually playing
+      mediaPlayer.currentTime = rangeStart;
+      mediaPlayer.play();
     }
   };
 
@@ -72,6 +80,7 @@ export default function MediaPlayerScreen() {
   const getRangeButtonText = (): string => {
     if (isRangeMode) return "Range Active";
     if (isSettingPointB) return "Set Point B";
+    if (rangeStart && rangeEnd) return "Play Range";
     return "Set Point A";
   };
 
@@ -82,7 +91,7 @@ export default function MediaPlayerScreen() {
   };
 
   const getRangeDisplayText = (): string => {
-    if (!isRangeMode || !rangeStart || !rangeEnd) return "";
+    if (!rangeStart || !rangeEnd) return "";
     return `Range: ${formatTime(rangeStart)} - ${formatTime(rangeEnd)}`;
   };
 
@@ -92,7 +101,7 @@ export default function MediaPlayerScreen() {
     setCurrentTime(time);
 
     // Phase 3: Exit range mode if time goes out of bounds
-    if (isRangeMode && rangeStart !== null && rangeEnd !== null) {
+    if (rangeStart !== null && rangeEnd !== null) {
       // if (time < rangeStart || time > rangeEnd) {
       //   // Silent exit from range mode
       //   setRangeStart(null);
@@ -202,15 +211,16 @@ export default function MediaPlayerScreen() {
               borderRadius: 8,
               alignItems: "center",
             }}
-            onPress={handleRangeButtonPress}
-            // disabled={isRangeButtonDisabled()}
+            onPress={
+              rangeStart && rangeEnd ? handlePlayRange : handleRangeButtonPress
+            }
           >
             <Text style={{ color: "white", fontWeight: "bold" }}>
               {getRangeButtonText()}
             </Text>
           </TouchableOpacity>
         )}
-        {isRangeMode && (
+        {rangeStart && rangeEnd && (
           <TouchableOpacity
             style={{
               backgroundColor: "#FF3B30",
