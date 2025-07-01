@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { Stack } from "expo-router";
 import { useVideoPlayer } from "expo-video";
 import MediaPlayer from "../../components/MediaPlayer";
@@ -21,7 +21,7 @@ export default function MediaPlayerScreen() {
 
   const [mediaSource, setMediaSource] = useState<string>("");
 
-  // Range management
+  // Phase 1: Range management
   const [rangeStart, setRangeStart] = useState<number | null>(null);
   const [rangeEnd, setRangeEnd] = useState<number | null>(null);
   const [isRangeMode, setIsRangeMode] = useState<boolean>(false);
@@ -42,8 +42,52 @@ export default function MediaPlayerScreen() {
     return currentTime > rangeStart + 1; // At least 1 second difference
   };
 
+  // Phase 2: Button logic and state transitions
+  const handleRangeButtonPress = () => {
+    if (!isSettingPointB) {
+      // Setting point A
+      setRangeStart(currentTime);
+      setIsSettingPointB(true);
+    } else {
+      // Setting point B
+      if (isCurrentTimeValidForPointB()) {
+        setRangeEnd(currentTime);
+        setIsRangeMode(true);
+        setIsSettingPointB(false);
+      }
+    }
+  };
+
+  const handleResetRange = () => {
+    setRangeStart(null);
+    setRangeEnd(null);
+    setIsRangeMode(false);
+    setIsSettingPointB(false);
+  };
+
+  const getRangeButtonText = (): string => {
+    if (isRangeMode) return "Range Active";
+    if (isSettingPointB) return "Set Point B";
+    return "Set Point A";
+  };
+
+  const isRangeButtonDisabled = (): boolean => {
+    if (isRangeMode) return true;
+    if (isSettingPointB) return !isCurrentTimeValidForPointB();
+    return false;
+  };
+
+  const getRangeDisplayText = (): string => {
+    if (!isRangeMode || !rangeStart || !rangeEnd) return "";
+    return `Range: ${formatTime(rangeStart)} - ${formatTime(rangeEnd)}`;
+  };
+
   useEventListener(mediaPlayer, "timeUpdate", (event) => {
     const time = event.currentTime;
+
+    // Phrase 2: Button logic and state transitions > Update current time
+    setCurrentTime(time);
+
     const timeSinceLastStore = time - lastStoredTimeRef.current;
 
     if (timeSinceLastStore < 5) return;
@@ -78,8 +122,47 @@ export default function MediaPlayerScreen() {
   }
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <MediaPlayer mediaPlayer={mediaPlayer} />
+
+      {/* Phase 2: Range controls buttons */}
+      <View style={{ padding: 16, gap: 12 }}>
+        <Text style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center' }}>
+          {getRangeDisplayText()}
+        </Text>
+        
+        <TouchableOpacity
+          style={{
+            backgroundColor: isRangeButtonDisabled() ? '#ccc' : '#007AFF',
+            padding: 12,
+            borderRadius: 8,
+            alignItems: 'center'
+          }}
+          onPress={handleRangeButtonPress}
+          disabled={isRangeButtonDisabled()}
+        >
+          <Text style={{ color: 'white', fontWeight: 'bold' }}>
+            {getRangeButtonText()}
+          </Text>
+        </TouchableOpacity>
+
+        {isRangeMode && (
+          <TouchableOpacity
+            style={{
+              backgroundColor: '#FF3B30',
+              padding: 12,
+              borderRadius: 8,
+              alignItems: 'center'
+            }}
+            onPress={handleResetRange}
+          >
+            <Text style={{ color: 'white', fontWeight: 'bold' }}>
+              Reset Range
+            </Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
       <Stack.Screen options={{ title: theMedia?.title }} />
     </View>
   );
