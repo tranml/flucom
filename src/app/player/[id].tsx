@@ -101,7 +101,7 @@ export default function MediaPlayerScreen() {
     setCurrentTime(time);
 
     // Phase 3: Exit range mode if time goes out of bounds
-    if (rangeStart !== null && rangeEnd !== null) {
+    if (isRangeMode && rangeStart !== null && rangeEnd !== null) {
       // if (time < rangeStart || time > rangeEnd) {
       //   // Silent exit from range mode
       //   setRangeStart(null);
@@ -112,12 +112,7 @@ export default function MediaPlayerScreen() {
 
       if (time >= rangeEnd) {
         mediaPlayer.currentTime = rangeStart;
-
-        if (isRangeMode) {
-          mediaPlayer.play();
-        } else {
-          mediaPlayer.pause();
-        }
+        mediaPlayer.play();
       }
 
       if (time < rangeStart - 2) {
