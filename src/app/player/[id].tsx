@@ -5,11 +5,13 @@ import MediaPlayer from "../../components/MediaPlayer";
 
 import { useEventListener } from "expo";
 import * as FileSystem from "expo-file-system";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator } from "react-native";
 import { media } from "../../lib/media-data";
 
 import { useLocalSearchParams } from "expo-router";
+
+import { asGetData, asStoreData } from "../../utils/handleAsyncStorage";
 
 export default function MediaPlayerScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -20,18 +22,33 @@ export default function MediaPlayerScreen() {
   const mediaPlayer = useVideoPlayer(mediaSource, (player) => {
     player.showNowPlayingNotification = true;
     player.timeUpdateEventInterval = 0.5;
-    player.play();
+    // player.play();
   });
 
+  const lastStoredTimeRef = useRef<number>(0);
+
   useEventListener(mediaPlayer, "timeUpdate", (event) => {
-    console.log("Current time: ", event.currentTime);
+    const currentTime = event.currentTime;
+    const timeSinceLastStore = currentTime - lastStoredTimeRef.current;
+
+    if (timeSinceLastStore < 5) return;
+
+    asStoreData("last-stored-time--media-" + id, currentTime.toString());
+    lastStoredTimeRef.current = currentTime;
   });
 
   useEffect(() => {
     const mediaPath = getLocalMediaPath(id);
-    console.log("mediaPath", mediaPath);
     setMediaSource(mediaPath);
-  }, [id]);
+
+    if (!mediaPlayer) return;
+
+    asGetData("last-stored-time--media-" + id).then((time) => {
+      if (time) {
+        mediaPlayer.currentTime = Number.parseInt(time);
+      }
+    });
+  }, [id, mediaPlayer]);
 
   const getLocalMediaPath = (id: string) => {
     return FileSystem.documentDirectory + id + ".mp4";
