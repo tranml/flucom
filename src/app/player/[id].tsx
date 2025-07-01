@@ -82,11 +82,21 @@ export default function MediaPlayerScreen() {
     return `Range: ${formatTime(rangeStart)} - ${formatTime(rangeEnd)}`;
   };
 
-  useEventListener(mediaPlayer, "timeUpdate", (event) => {
+  // Phase 3: Simple video playback control
+  const handleTimeUpdate = (event: any) => {
     const time = event.currentTime;
-
-    // Phrase 2: Button logic and state transitions > Update current time
     setCurrentTime(time);
+
+    // Phase 3: Exit range mode if time goes out of bounds
+    if (isRangeMode && rangeStart !== null && rangeEnd !== null) {
+      if (time < rangeStart || time > rangeEnd) {
+        // Silent exit from range mode
+        setRangeStart(null);
+        setRangeEnd(null);
+        setIsRangeMode(false);
+        setIsSettingPointB(false);
+      }
+    }
 
     const timeSinceLastStore = time - lastStoredTimeRef.current;
 
@@ -94,7 +104,23 @@ export default function MediaPlayerScreen() {
 
     asStoreData("last-stored-time--media-" + id, time.toString());
     lastStoredTimeRef.current = time;
-  });
+  };
+
+  useEventListener(mediaPlayer, "timeUpdate", handleTimeUpdate);
+
+  // useEventListener(mediaPlayer, "timeUpdate", (event) => {
+  //   const time = event.currentTime;
+
+  //   // Phrase 2: Button logic and state transitions > Update current time
+  //   setCurrentTime(time);
+
+  //   const timeSinceLastStore = time - lastStoredTimeRef.current;
+
+  //   if (timeSinceLastStore < 5) return;
+
+  //   asStoreData("last-stored-time--media-" + id, time.toString());
+  //   lastStoredTimeRef.current = time;
+  // });
 
   useEffect(() => {
     const mediaPath = getLocalMediaPath(id);
