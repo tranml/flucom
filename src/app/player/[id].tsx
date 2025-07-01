@@ -43,13 +43,13 @@ export default function MediaPlayerScreen() {
   };
 
   useEventListener(mediaPlayer, "timeUpdate", (event) => {
-    const currentTime = event.currentTime;
-    const timeSinceLastStore = currentTime - lastStoredTimeRef.current;
+    const time = event.currentTime;
+    const timeSinceLastStore = time - lastStoredTimeRef.current;
 
     if (timeSinceLastStore < 5) return;
 
-    asStoreData("last-stored-time--media-" + id, currentTime.toString());
-    lastStoredTimeRef.current = currentTime;
+    asStoreData("last-stored-time--media-" + id, time.toString());
+    lastStoredTimeRef.current = time;
   });
 
   useEffect(() => {
