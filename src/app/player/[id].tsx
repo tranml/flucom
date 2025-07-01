@@ -11,7 +11,7 @@ import { media } from "../../lib/media-data";
 
 import { useLocalSearchParams } from "expo-router";
 
-import { asStoreData } from "../../utils/handleAsyncStorage";
+import { asGetData, asStoreData } from "../../utils/handleAsyncStorage";
 
 export default function MediaPlayerScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -22,7 +22,7 @@ export default function MediaPlayerScreen() {
   const mediaPlayer = useVideoPlayer(mediaSource, (player) => {
     player.showNowPlayingNotification = true;
     player.timeUpdateEventInterval = 0.5;
-    player.play();
+    // player.play();
   });
 
   const lastStoredTimeRef = useRef<number>(0);
@@ -39,9 +39,16 @@ export default function MediaPlayerScreen() {
 
   useEffect(() => {
     const mediaPath = getLocalMediaPath(id);
-    console.log("mediaPath", mediaPath);
     setMediaSource(mediaPath);
-  }, [id]);
+
+    if (!mediaPlayer) return;
+
+    asGetData("last-stored-time--media-" + id).then((time) => {
+      if (time) {
+        mediaPlayer.currentTime = Number.parseInt(time);
+      }
+    });
+  }, [id, mediaPlayer]);
 
   const getLocalMediaPath = (id: string) => {
     return FileSystem.documentDirectory + id + ".mp4";

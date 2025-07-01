@@ -8,11 +8,6 @@ import { asGetData } from "../utils/handleAsyncStorage";
 import { useEffect } from "react";
 
 export default function HomeScreen() {
-  useEffect(() => {
-    asGetData("last-stored-time--media-2").then((time) => {
-      console.log("Last stored time: ", time);
-    });
-  }, []);
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
