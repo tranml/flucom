@@ -111,8 +111,13 @@ export default function MediaPlayerScreen() {
       // }
 
       if (time >= rangeEnd) {
-        mediaPlayer.pause();
         mediaPlayer.currentTime = rangeStart;
+
+        if (isRangeMode) {
+          mediaPlayer.play();
+        } else {
+          mediaPlayer.pause();
+        }
       }
 
       if (time < rangeStart - 2) {
@@ -183,27 +188,50 @@ export default function MediaPlayerScreen() {
         </Text>
 
         {isRangeMode ? (
-          <TouchableOpacity
-            style={{
-              backgroundColor: "#007AFF",
-              padding: 12,
-              borderRadius: 8,
-              alignItems: "center",
-            }}
-            onPress={() => {
-              if (isPlaying) {
-                // mediaPlayer.pause();
-                mediaPlayer.currentTime = rangeStart ?? 0;
-                mediaPlayer.play();
-              } else {
-                mediaPlayer.play();
-              }
-            }}
-          >
-            <Text style={{ color: "white", fontWeight: "bold" }}>
-              {isPlaying ? "Restart" : "Play"}
-            </Text>
-          </TouchableOpacity>
+          <View style={{ flexDirection: "row", gap: 12, alignItems: "center", justifyContent: "center" }}>
+            <TouchableOpacity
+              style={{
+                backgroundColor: "#007AFF",
+                padding: 12,
+                borderRadius: 8,
+                alignItems: "center",
+                flex: 1,
+              }}
+              onPress={() => {
+                if (isPlaying) {
+                  // mediaPlayer.pause();
+                  mediaPlayer.currentTime = rangeStart ?? 0;
+                  mediaPlayer.play();
+                } else {
+                  mediaPlayer.play();
+                }
+              }}
+            >
+              <Text style={{ color: "white", fontWeight: "bold" }}>
+                {isPlaying ? "Restart" : "Play"}
+              </Text>
+            </TouchableOpacity>
+            {isPlaying && (
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "#007AFF",
+                  padding: 12,
+                  borderRadius: 8,
+                  alignItems: "center",
+                  flex: 1,
+                }}
+                onPress={() => {
+                  if (isPlaying) {
+                    mediaPlayer.pause();
+                  }
+                }}
+              >
+                <Text style={{ color: "white", fontWeight: "bold" }}>
+                  Pause
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
         ) : (
           <TouchableOpacity
             style={{
@@ -229,7 +257,11 @@ export default function MediaPlayerScreen() {
               borderRadius: 8,
               alignItems: "center",
             }}
-            onPress={handleResetRange}
+            onPress={() => {
+              mediaPlayer.pause();
+              mediaPlayer.currentTime = rangeStart ?? 0;
+              handleResetRange();
+            }}
           >
             <Text style={{ color: "white", fontWeight: "bold" }}>
               Reset Range
