@@ -192,8 +192,9 @@ export default function MediaPlayerScreen() {
             }}
             onPress={() => {
               if (isPlaying) {
-                mediaPlayer.pause();
+                // mediaPlayer.pause();
                 mediaPlayer.currentTime = rangeStart ?? 0;
+                mediaPlayer.play();
               } else {
                 mediaPlayer.play();
               }
