@@ -13,11 +13,20 @@ import { useLocalSearchParams } from "expo-router";
 
 import { asGetData, asStoreData } from "../../utils/handleAsyncStorage";
 
+import { formatTime } from "../../utils/formatTime";
+
 export default function MediaPlayerScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const theMedia = media.find((m) => m.id === id);
 
   const [mediaSource, setMediaSource] = useState<string>("");
+
+  // Range management
+  const [rangeStart, setRangeStart] = useState<number | null>(null);
+  const [rangeEnd, setRangeEnd] = useState<number | null>(null);
+  const [isRangeMode, setIsRangeMode] = useState<boolean>(false);
+  const [isSettingPointB, setIsSettingPointB] = useState<boolean>(false);
+  const [currentTime, setCurrentTime] = useState<number>(0);
 
   const mediaPlayer = useVideoPlayer(mediaSource, (player) => {
     player.showNowPlayingNotification = true;
@@ -26,6 +35,12 @@ export default function MediaPlayerScreen() {
   });
 
   const lastStoredTimeRef = useRef<number>(0);
+
+  // Phase 1: Validation logic for range selection
+  const isCurrentTimeValidForPointB = (): boolean => {
+    if (!rangeStart) return false;
+    return currentTime > rangeStart + 1; // At least 1 second difference
+  };
 
   useEventListener(mediaPlayer, "timeUpdate", (event) => {
     const currentTime = event.currentTime;
