@@ -188,7 +188,14 @@ export default function MediaPlayerScreen() {
         </Text>
 
         {isRangeMode ? (
-          <View style={{ flexDirection: "row", gap: 12, alignItems: "center", justifyContent: "center" }}>
+          <View
+            style={{
+              flexDirection: "row",
+              gap: 12,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <TouchableOpacity
               style={{
                 backgroundColor: "#007AFF",
@@ -258,8 +265,8 @@ export default function MediaPlayerScreen() {
               alignItems: "center",
             }}
             onPress={() => {
-              mediaPlayer.pause();
-              mediaPlayer.currentTime = rangeStart ?? 0;
+              // mediaPlayer.pause();
+              // mediaPlayer.currentTime = rangeStart ?? 0;
               handleResetRange();
             }}
           >
