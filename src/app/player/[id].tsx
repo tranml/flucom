@@ -183,57 +183,26 @@ export default function MediaPlayerScreen() {
         </Text>
 
         {isRangeMode ? (
-          <View
+          <TouchableOpacity
             style={{
-              flexDirection: "row",
-              gap: 12,
+              backgroundColor: "#007AFF",
+              padding: 12,
+              borderRadius: 8,
               alignItems: "center",
-              justifyContent: "center",
+              flex: 1,
+            }}
+            onPress={() => {
+              if (isPlaying) {
+                mediaPlayer.pause();
+              } else {
+                mediaPlayer.play();
+              }
             }}
           >
-            <TouchableOpacity
-              style={{
-                backgroundColor: "#007AFF",
-                padding: 12,
-                borderRadius: 8,
-                alignItems: "center",
-                flex: 1,
-              }}
-              onPress={() => {
-                if (isPlaying) {
-                  // mediaPlayer.pause();
-                  mediaPlayer.currentTime = rangeStart ?? 0;
-                  mediaPlayer.play();
-                } else {
-                  mediaPlayer.play();
-                }
-              }}
-            >
-              <Text style={{ color: "white", fontWeight: "bold" }}>
-                {isPlaying ? "Restart" : "Play"}
-              </Text>
-            </TouchableOpacity>
-            {isPlaying && (
-              <TouchableOpacity
-                style={{
-                  backgroundColor: "#007AFF",
-                  padding: 12,
-                  borderRadius: 8,
-                  alignItems: "center",
-                  flex: 1,
-                }}
-                onPress={() => {
-                  if (isPlaying) {
-                    mediaPlayer.pause();
-                  }
-                }}
-              >
-                <Text style={{ color: "white", fontWeight: "bold" }}>
-                  Pause
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
+            <Text style={{ color: "white", fontWeight: "bold" }}>
+              {isPlaying ? "Pause" : "Play"}
+            </Text>
+          </TouchableOpacity>
         ) : (
           <TouchableOpacity
             style={{
