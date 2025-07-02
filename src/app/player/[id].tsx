@@ -46,6 +46,7 @@ export default function MediaPlayerScreen() {
     getRangeButtonText,
     isRangeButtonDisabled,
     getRangeDisplayText,
+    handleRangeLogic,
   } = useRangePlayer({
     mediaPlayer,
     currentTime,
@@ -58,7 +59,7 @@ export default function MediaPlayerScreen() {
     isPlaying: mediaPlayer.playing,
   });
 
-  // const lastStoredTimeRef = useRef<number>(0);
+  const lastStoredTimeRef = useRef<number>(0);
 
   // const isCurrentTimeValidForPointB = (): boolean => {
   //   if (!rangeStart) return false;
@@ -160,6 +161,37 @@ export default function MediaPlayerScreen() {
       mediaPlayer.play();
     }
   };
+
+    // Time update handler
+  const handleTimeUpdate = (event: any) => {
+    const time = event.currentTime;
+    setCurrentTime(time);
+
+    // Range logic
+    handleRangeLogic(time);
+
+    // Range logic
+    // if (isRangeMode && rangeStart !== null && rangeEnd !== null) {
+    //   if (time >= rangeEnd) {
+    //     mediaPlayer.currentTime = rangeStart;
+    //     mediaPlayer.play();
+    //   }
+
+    //   if (time < rangeStart - 2) {
+    //     handleResetRange();
+    //   }
+    // }
+
+    // Time storage logic
+    const timeSinceLastStore = time - lastStoredTimeRef.current;
+    if (timeSinceLastStore < 5) return;
+
+    asStoreData("last-stored-time--media-" + id, time.toString());
+    lastStoredTimeRef.current = time;
+  };
+
+  // Set up event listener
+  useEventListener(mediaPlayer, "timeUpdate", handleTimeUpdate);
 
   if (!mediaSource) {
     return (

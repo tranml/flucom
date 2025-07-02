@@ -21,7 +21,7 @@ export const useRangePlayer = ({
   const [isRangeMode, setIsRangeMode] = useState<boolean>(false);
   const [isSettingPointB, setIsSettingPointB] = useState<boolean>(false);
 
-  const lastStoredTimeRef = useRef<number>(0);
+  //   const lastStoredTimeRef = useRef<number>(0);
 
   const isCurrentTimeValidForPointB = (): boolean => {
     if (!rangeStart) return false;
@@ -74,12 +74,36 @@ export const useRangePlayer = ({
     return `Range: ${formatTime(rangeStart)} - ${formatTime(rangeEnd)}`;
   };
 
-  // Time update handler
-  const handleTimeUpdate = (event: any) => {
-    const time = event.currentTime;
-    setCurrentTime(time);
+  //   // Time update handler
+  //   const handleTimeUpdate = (event: any) => {
+  //     const time = event.currentTime;
+  //     setCurrentTime(time);
 
-    // Range logic
+  //     // Range logic
+  //     if (isRangeMode && rangeStart !== null && rangeEnd !== null) {
+  //       if (time >= rangeEnd) {
+  //         mediaPlayer.currentTime = rangeStart;
+  //         mediaPlayer.play();
+  //       }
+
+  //       if (time < rangeStart - 2) {
+  //         handleResetRange();
+  //       }
+  //     }
+
+  //     // Time storage logic
+  //     const timeSinceLastStore = time - lastStoredTimeRef.current;
+  //     if (timeSinceLastStore < 5) return;
+
+  //     asStoreData("last-stored-time--media-" + id, time.toString());
+  //     lastStoredTimeRef.current = time;
+  //   };
+
+  //   // Set up event listener
+  //   useEventListener(mediaPlayer, "timeUpdate", handleTimeUpdate);
+
+  // handle Range logic
+  const handleRangeLogic = (time: number) => {
     if (isRangeMode && rangeStart !== null && rangeEnd !== null) {
       if (time >= rangeEnd) {
         mediaPlayer.currentTime = rangeStart;
@@ -90,17 +114,7 @@ export const useRangePlayer = ({
         handleResetRange();
       }
     }
-
-    // Time storage logic
-    const timeSinceLastStore = time - lastStoredTimeRef.current;
-    if (timeSinceLastStore < 5) return;
-
-    asStoreData("last-stored-time--media-" + id, time.toString());
-    lastStoredTimeRef.current = time;
   };
-
-  // Set up event listener
-  useEventListener(mediaPlayer, "timeUpdate", handleTimeUpdate);
 
   return {
     // State
@@ -113,6 +127,7 @@ export const useRangePlayer = ({
     handleRangeButtonPress,
     handlePlayRange,
     handleResetRange,
+    handleRangeLogic,
 
     // UI helpers
     getRangeButtonText,
