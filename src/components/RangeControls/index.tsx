@@ -4,19 +4,14 @@ import { RangeButton } from "./RangeButton";
 import { ResetButton } from "./ResetButton";
 
 interface RangeControlsProps {
-  // State
   rangeStart: number | null;
   rangeEnd: number | null;
   isRangeMode: boolean;
   isPlaying?: boolean;
-  
-  // Handlers
   handleRangeButtonPress: () => void;
   handlePlayRange: () => void;
   handleResetRange: () => void;
   handlePlayPause?: () => void;
-  
-  // UI helpers
   isRangeButtonDisabled: boolean;
   getRangeButtonText: () => string;
   getRangeDisplayText: () => string;
