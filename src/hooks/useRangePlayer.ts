@@ -107,7 +107,7 @@ export const useRangePlayer = ({
     rangeStart,
     rangeEnd,
     isRangeMode,
-    isSettingPointB,
+    // isSettingPointB,
 
     // Handlers
     handleRangeButtonPress,

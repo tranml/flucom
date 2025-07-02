@@ -14,6 +14,8 @@ import { useLocalSearchParams } from "expo-router";
 import { asGetData, asStoreData } from "../../utils/handleAsyncStorage";
 
 import { formatTime } from "../../utils/formatTime";
+import { useRangePlayer } from "../../hooks/useRangePlayer";
+import { RangeControls } from "../../components/RangeControls";
 
 export default function MediaPlayerScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -21,97 +23,117 @@ export default function MediaPlayerScreen() {
 
   const [mediaSource, setMediaSource] = useState<string>("");
 
-  const [rangeStart, setRangeStart] = useState<number | null>(null);
-  const [rangeEnd, setRangeEnd] = useState<number | null>(null);
-  const [isRangeMode, setIsRangeMode] = useState<boolean>(false);
-  const [isSettingPointB, setIsSettingPointB] = useState<boolean>(false);
+  // const [rangeStart, setRangeStart] = useState<number | null>(null);
+  // const [rangeEnd, setRangeEnd] = useState<number | null>(null);
+  // const [isRangeMode, setIsRangeMode] = useState<boolean>(false);
+  // const [isSettingPointB, setIsSettingPointB] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
 
+  
   const mediaPlayer = useVideoPlayer(mediaSource, (player) => {
     player.showNowPlayingNotification = true;
     player.timeUpdateEventInterval = 0.5;
   });
 
+  const {
+    rangeStart,
+    rangeEnd,
+    isRangeMode,
+    // isSettingPointB,
+    handleRangeButtonPress,
+    handlePlayRange,
+    handleResetRange,
+    getRangeButtonText,
+    isRangeButtonDisabled,
+    getRangeDisplayText,
+  } = useRangePlayer({
+    mediaPlayer,
+    currentTime,
+    setCurrentTime,
+    id,
+  });
+
+
   const { isPlaying } = useEvent(mediaPlayer, "playingChange", {
     isPlaying: mediaPlayer.playing,
   });
 
-  const lastStoredTimeRef = useRef<number>(0);
+  // const lastStoredTimeRef = useRef<number>(0);
 
-  const isCurrentTimeValidForPointB = (): boolean => {
-    if (!rangeStart) return false;
-    return currentTime > rangeStart + 1;
-  };
+  // const isCurrentTimeValidForPointB = (): boolean => {
+  //   if (!rangeStart) return false;
+  //   return currentTime > rangeStart + 1;
+  // };
 
-  const handleRangeButtonPress = () => {
-    if (!isSettingPointB) {
-      setRangeStart(currentTime);
-      setIsSettingPointB(true);
-    } else {
-      if (isCurrentTimeValidForPointB()) {
-        setRangeEnd(currentTime);
-        setIsSettingPointB(false);
-      }
-    }
-  };
+  // const handleRangeButtonPress = () => {
+  //   if (!isSettingPointB) {
+  //     setRangeStart(currentTime);
+  //     setIsSettingPointB(true);
+  //   } else {
+  //     if (isCurrentTimeValidForPointB()) {
+  //       setRangeEnd(currentTime);
+  //       setIsSettingPointB(false);
+  //     }
+  //   }
+  // };
 
-  const handlePlayRange = () => {
-    if (rangeStart !== null && rangeEnd !== null) {
-      setIsRangeMode(true);
-      mediaPlayer.currentTime = rangeStart;
-      mediaPlayer.play();
-    }
-  };
+  // const handlePlayRange = () => {
+  //   if (rangeStart !== null && rangeEnd !== null) {
+  //     setIsRangeMode(true);
+  //     mediaPlayer.currentTime = rangeStart;
+  //     mediaPlayer.play();
+  //   }
+  // };
 
-  const handleResetRange = () => {
-    setRangeStart(null);
-    setRangeEnd(null);
-    setIsRangeMode(false);
-    setIsSettingPointB(false);
-  };
+  // const handleResetRange = () => {
+  //   setRangeStart(null);
+  //   setRangeEnd(null);
+  //   setIsRangeMode(false);
+  //   setIsSettingPointB(false);
+  // };
 
-  const getRangeButtonText = (): string => {
-    if (isRangeMode) return "Range Active";
-    if (isSettingPointB) return "Set Point B";
-    if (rangeStart && rangeEnd) return "Play Range";
-    return "Set Point A";
-  };
+  // const getRangeButtonText = (): string => {
+  //   if (isRangeMode) return "Range Active";
+  //   if (isSettingPointB) return "Set Point B";
+  //   if (rangeStart && rangeEnd) return "Play Range";
+  //   return "Set Point A";
+  // };
 
-  const isRangeButtonDisabled = (): boolean => {
-    if (isRangeMode) return true;
-    if (isSettingPointB) return !isCurrentTimeValidForPointB();
-    return false;
-  };
+  // const isRangeButtonDisabled = (): boolean => {
+  //   if (isRangeMode) return true;
+  //   if (isSettingPointB) return !isCurrentTimeValidForPointB();
+  //   return false;
+  // };
 
-  const getRangeDisplayText = (): string => {
-    if (!rangeStart || !rangeEnd) return "";
-    return `Range: ${formatTime(rangeStart)} - ${formatTime(rangeEnd)}`;
-  };
+  // const getRangeDisplayText = (): string => {
+  //   if (!rangeStart || !rangeEnd) return "";
+  //   return `Range: ${formatTime(rangeStart)} - ${formatTime(rangeEnd)}`;
+  // };
 
-  const handleTimeUpdate = (event: any) => {
-    const time = event.currentTime;
-    setCurrentTime(time);
+  // const handleTimeUpdate = (event: any) => {
+  //   const time = event.currentTime;
+  //   setCurrentTime(time);
 
-    if (isRangeMode && rangeStart !== null && rangeEnd !== null) {
-      if (time >= rangeEnd) {
-        mediaPlayer.currentTime = rangeStart;
-        mediaPlayer.play();
-      }
+  //   if (isRangeMode && rangeStart !== null && rangeEnd !== null) {
+  //     if (time >= rangeEnd) {
+  //       mediaPlayer.currentTime = rangeStart;
+  //       mediaPlayer.play();
+  //     }
 
-      if (time < rangeStart - 2) {
-        handleResetRange();
-      }
-    }
+  //     if (time < rangeStart - 2) {
+  //       handleResetRange();
+  //     }
+  //   }
 
-    const timeSinceLastStore = time - lastStoredTimeRef.current;
+  //   const timeSinceLastStore = time - lastStoredTimeRef.current;
 
-    if (timeSinceLastStore < 5) return;
+  //   if (timeSinceLastStore < 5) return;
 
-    asStoreData("last-stored-time--media-" + id, time.toString());
-    lastStoredTimeRef.current = time;
-  };
+  //   asStoreData("last-stored-time--media-" + id, time.toString());
+  //   lastStoredTimeRef.current = time;
+  // };
 
-  useEventListener(mediaPlayer, "timeUpdate", handleTimeUpdate);
+  // useEventListener(mediaPlayer, "timeUpdate", handleTimeUpdate);
 
   useEffect(() => {
     const mediaPath = getLocalMediaPath(id);
@@ -130,6 +152,15 @@ export default function MediaPlayerScreen() {
     return FileSystem.documentDirectory + id + ".mp4";
   };
 
+    // Handle play/pause for range mode
+  const handlePlayPause = () => {
+    if (isPlaying) {
+      mediaPlayer.pause();
+    } else {
+      mediaPlayer.play();
+    }
+  };
+
   if (!mediaSource) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -142,7 +173,7 @@ export default function MediaPlayerScreen() {
     <View style={{ flex: 1 }}>
       <MediaPlayer mediaPlayer={mediaPlayer} />
 
-      <View style={{ padding: 16, gap: 12 }}>
+      {/* <View style={{ padding: 16, gap: 12 }}>
         <Text style={{ fontSize: 16, fontWeight: "bold", textAlign: "center" }}>
           {getRangeDisplayText()}
         </Text>
@@ -202,7 +233,20 @@ export default function MediaPlayerScreen() {
             </Text>
           </TouchableOpacity>
         )}
-      </View>
+      </View> */}
+
+      <RangeControls
+        rangeStart={rangeStart}
+        rangeEnd={rangeEnd}
+        isRangeMode={isRangeMode}
+        isPlaying={isPlaying}
+        handleRangeButtonPress={handleRangeButtonPress}
+        handlePlayRange={handlePlayRange}
+        handleResetRange={handleResetRange}
+        handlePlayPause={handlePlayPause}
+        isRangeButtonDisabled={isRangeButtonDisabled()}
+        getRangeButtonText={getRangeButtonText}
+      />
 
       <Stack.Screen options={{ title: theMedia?.title }} />
     </View>
