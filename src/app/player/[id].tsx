@@ -16,6 +16,8 @@ import { asGetData, asStoreData } from "../../utils/handleAsyncStorage";
 import { useRangePlayer } from "../../hooks/useRangePlayer";
 import { RangeControls } from "../../components/RangeControls";
 import { SubtitleEntry } from "../../types";
+import { parseSubtitleText } from "../../utils/subtitleParser";
+import { sub3 } from "../../lib/sub3";
 
 export default function MediaPlayerScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -149,6 +151,10 @@ export default function MediaPlayerScreen() {
       </View>
     );
   }
+  console.log(
+    "parseSubtitleText",
+    JSON.stringify(parseSubtitleText(sub3), null, 2)
+  );
 
   return (
     <View style={{ flex: 1 }}>
