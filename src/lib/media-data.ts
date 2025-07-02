@@ -1,6 +1,8 @@
 import { Media, LessonSet, Course } from "../types";
 import path from "path";
 
+import { subtitle2, subtitle3 } from "./subtitle-data";
+
 export const media: Media[] = [
   {
     id: "1",
@@ -21,6 +23,7 @@ export const media: Media[] = [
     order: 4,
     createdAt: "2025-06-29T00:00:00.000Z",
     updatedAt: "2025-06-29T00:00:00.000Z",
+    subtitles: subtitle2,
   },
   {
     id: "3",
@@ -31,6 +34,7 @@ export const media: Media[] = [
     order: 1,
     createdAt: "2025-06-29T00:00:00.000Z",
     updatedAt: "2025-06-29T00:00:00.000Z",
+    subtitles: subtitle3,
   },
 ];
 

@@ -8,6 +8,7 @@ export type Media = {
   order: number;
   createdAt: string;
   updatedAt: string;
+  subtitles?: SubtitleEntry[];
 };
 
 export type LessonSet = {
@@ -29,4 +30,15 @@ export type Course = {
   order: number;
   createdAt: string;
   updatedAt: string;
+};
+
+// Subtitle
+export type SubtitleEntry = {
+  id: number;
+  startTime: number;
+  endTime: number;
+  text: string;
+  phonetic: string;
+  translation: string;
+  speaker: string;
 };
