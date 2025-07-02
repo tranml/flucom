@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { Text, View } from "react-native";
 import { Stack } from "expo-router";
 import { useVideoPlayer } from "expo-video";
 import MediaPlayer from "../../components/MediaPlayer";
@@ -15,6 +15,7 @@ import { asGetData, asStoreData } from "../../utils/handleAsyncStorage";
 
 import { useRangePlayer } from "../../hooks/useRangePlayer";
 import { RangeControls } from "../../components/RangeControls";
+import { SubtitleEntry } from "../../types";
 
 export default function MediaPlayerScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -23,6 +24,11 @@ export default function MediaPlayerScreen() {
   const [mediaSource, setMediaSource] = useState<string>("");
 
   const [currentTime, setCurrentTime] = useState<number>(0);
+
+  // Add state for caching current subtitle
+  const [currentSubtitle, setCurrentSubtitle] = useState<SubtitleEntry | null>(
+    null
+  );
 
   const mediaPlayer = useVideoPlayer(mediaSource, (player) => {
     player.showNowPlayingNotification = true;
@@ -91,15 +97,9 @@ export default function MediaPlayerScreen() {
       return;
     }
 
-    // subtitles
-    if (theMedia?.subtitles) {
-      console.log("time", time);
-      const currentSubtitle = theMedia.subtitles.find(
-        (s) => s.startTime <= time * 1000 && s.endTime >= time * 1000
-      );
-      if (currentSubtitle) {
-        console.log("currentSubtitle", currentSubtitle.text);
-      }
+    const currentSubtitle = getCurrentSubtitle(time);
+    if (currentSubtitle) {
+      console.log("currentSubtitle", currentSubtitle.text);
     }
 
     if (timeSinceLastStore < 5) return;
@@ -109,6 +109,30 @@ export default function MediaPlayerScreen() {
   };
 
   useEventListener(mediaPlayer, "timeUpdate", handleTimeUpdate);
+
+  const getCurrentSubtitle = (time: number) => {
+    // Optimized subtitle logic with caching
+    if (!theMedia?.subtitles) return null;
+
+    const timeInMs = time * 1000;
+
+    // Check if current time is outside the cached subtitle's range
+    const needsNewSubtitle =
+      !currentSubtitle ||
+      timeInMs < currentSubtitle.startTime ||
+      timeInMs > currentSubtitle.endTime;
+
+    if (needsNewSubtitle) {
+      const newSubtitle = theMedia.subtitles.find(
+        (s) => s.startTime <= timeInMs && s.endTime >= timeInMs
+      );
+
+      if (newSubtitle !== currentSubtitle) {
+        setCurrentSubtitle(newSubtitle || null);
+        return newSubtitle;
+      }
+    }
+  };
 
   if (!mediaSource) {
     return (
@@ -121,6 +145,7 @@ export default function MediaPlayerScreen() {
   return (
     <View style={{ flex: 1 }}>
       <MediaPlayer mediaPlayer={mediaPlayer} />
+      <Text>{currentSubtitle?.text}</Text>
 
       <RangeControls
         rangeStart={rangeStart}
