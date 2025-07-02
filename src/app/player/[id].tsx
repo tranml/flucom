@@ -1,4 +1,4 @@
-import { Text, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { Stack } from "expo-router";
 import { useVideoPlayer } from "expo-video";
 import MediaPlayer from "../../components/MediaPlayer";
@@ -48,6 +48,8 @@ export default function MediaPlayerScreen() {
     isRangeButtonDisabled,
     getRangeDisplayText,
     handleRangeLogic,
+    // TODO: Play in range based on subtitle
+    setRangeFromSubtitle,
   } = useRangePlayer({
     mediaPlayer,
     currentTime,
@@ -134,6 +136,12 @@ export default function MediaPlayerScreen() {
     }
   };
 
+  const handleSubtitlePress = () => {
+    if (currentSubtitle && !isRangeMode) {
+      setRangeFromSubtitle(currentSubtitle.startTime, currentSubtitle.endTime);
+    }
+  };
+
   if (!mediaSource) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -145,7 +153,10 @@ export default function MediaPlayerScreen() {
   return (
     <View style={{ flex: 1 }}>
       <MediaPlayer mediaPlayer={mediaPlayer} />
-      <Text>{currentSubtitle?.text}</Text>
+
+      <TouchableOpacity onPress={handleSubtitlePress} disabled={isRangeMode}>
+        <Text>{currentSubtitle?.text}</Text>
+      </TouchableOpacity>
 
       <RangeControls
         rangeStart={rangeStart}
