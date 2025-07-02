@@ -246,6 +246,7 @@ export default function MediaPlayerScreen() {
         handlePlayPause={handlePlayPause}
         isRangeButtonDisabled={isRangeButtonDisabled()}
         getRangeButtonText={getRangeButtonText}
+        getRangeDisplayText={getRangeDisplayText}
       />
 
       <Stack.Screen options={{ title: theMedia?.title }} />

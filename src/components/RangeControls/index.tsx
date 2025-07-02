@@ -19,6 +19,7 @@ interface RangeControlsProps {
   // UI helpers
   isRangeButtonDisabled: boolean;
   getRangeButtonText: () => string;
+  getRangeDisplayText: () => string;
 }
 
 export const RangeControls = ({
@@ -32,10 +33,11 @@ export const RangeControls = ({
   handlePlayPause,
   isRangeButtonDisabled,
   getRangeButtonText,
+  getRangeDisplayText,
 }: RangeControlsProps) => {
   return (
     <View style={{ padding: 16, gap: 12 }}>
-      <RangeDisplay rangeStart={rangeStart} rangeEnd={rangeEnd} />
+      <RangeDisplay getRangeDisplayText={getRangeDisplayText} />
       
       <RangeButton
         isRangeMode={isRangeMode}
