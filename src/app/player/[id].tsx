@@ -29,6 +29,8 @@ export default function MediaPlayerScreen() {
     player.timeUpdateEventInterval = 0.5;
   });
 
+  // console.log("theMedia?.subtitles", JSON.stringify(theMedia?.subtitles, null, 2));
+
   const {
     rangeStart,
     rangeEnd,
@@ -87,6 +89,17 @@ export default function MediaPlayerScreen() {
     if (lastStoredTimeRef.current > time) {
       lastStoredTimeRef.current = time;
       return;
+    }
+
+    // subtitles
+    if (theMedia?.subtitles) {
+      console.log("time", time);
+      const currentSubtitle = theMedia.subtitles.find(
+        (s) => s.startTime <= time * 1000 && s.endTime >= time * 1000
+      );
+      if (currentSubtitle) {
+        console.log("currentSubtitle", currentSubtitle.text);
+      }
     }
 
     if (timeSinceLastStore < 5) return;
