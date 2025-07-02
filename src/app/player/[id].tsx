@@ -83,6 +83,12 @@ export default function MediaPlayerScreen() {
     handleRangeLogic(time);
 
     const timeSinceLastStore = time - lastStoredTimeRef.current;
+
+    if (lastStoredTimeRef.current > time) {
+      lastStoredTimeRef.current = time;
+      return;
+    }
+
     if (timeSinceLastStore < 5) return;
 
     asStoreData("last-stored-time--media-" + id, time.toString());
