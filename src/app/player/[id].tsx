@@ -3,7 +3,7 @@ import { Stack } from "expo-router";
 import { useVideoPlayer } from "expo-video";
 import MediaPlayer from "../../components/MediaPlayer";
 
-import { useEventListener } from "expo";
+import { useEvent, useEventListener } from "expo";
 import * as FileSystem from "expo-file-system";
 import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator } from "react-native";
@@ -13,29 +13,43 @@ import { useLocalSearchParams } from "expo-router";
 
 import { asGetData, asStoreData } from "../../utils/handleAsyncStorage";
 
+import { useRangePlayer } from "../../hooks/useRangePlayer";
+import { RangeControls } from "../../components/RangeControls";
+
 export default function MediaPlayerScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const theMedia = media.find((m) => m.id === id);
 
   const [mediaSource, setMediaSource] = useState<string>("");
 
+  const [currentTime, setCurrentTime] = useState<number>(0);
+
   const mediaPlayer = useVideoPlayer(mediaSource, (player) => {
     player.showNowPlayingNotification = true;
     player.timeUpdateEventInterval = 0.5;
-    // player.play();
+  });
+
+  const {
+    rangeStart,
+    rangeEnd,
+    isRangeMode,
+    handleRangeButtonPress,
+    handlePlayRange,
+    handleResetRange,
+    getRangeButtonText,
+    isRangeButtonDisabled,
+    getRangeDisplayText,
+    handleRangeLogic,
+  } = useRangePlayer({
+    mediaPlayer,
+    currentTime,
+  });
+
+  const { isPlaying } = useEvent(mediaPlayer, "playingChange", {
+    isPlaying: mediaPlayer.playing,
   });
 
   const lastStoredTimeRef = useRef<number>(0);
-
-  useEventListener(mediaPlayer, "timeUpdate", (event) => {
-    const currentTime = event.currentTime;
-    const timeSinceLastStore = currentTime - lastStoredTimeRef.current;
-
-    if (timeSinceLastStore < 5) return;
-
-    asStoreData("last-stored-time--media-" + id, currentTime.toString());
-    lastStoredTimeRef.current = currentTime;
-  });
 
   useEffect(() => {
     const mediaPath = getLocalMediaPath(id);
@@ -54,6 +68,29 @@ export default function MediaPlayerScreen() {
     return FileSystem.documentDirectory + id + ".mp4";
   };
 
+  const handlePlayPause = () => {
+    if (isPlaying) {
+      mediaPlayer.pause();
+    } else {
+      mediaPlayer.play();
+    }
+  };
+
+  const handleTimeUpdate = (event: any) => {
+    const time = event.currentTime;
+    setCurrentTime(time);
+
+    handleRangeLogic(time);
+
+    const timeSinceLastStore = time - lastStoredTimeRef.current;
+    if (timeSinceLastStore < 5) return;
+
+    asStoreData("last-stored-time--media-" + id, time.toString());
+    lastStoredTimeRef.current = time;
+  };
+
+  useEventListener(mediaPlayer, "timeUpdate", handleTimeUpdate);
+
   if (!mediaSource) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -63,8 +100,23 @@ export default function MediaPlayerScreen() {
   }
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <MediaPlayer mediaPlayer={mediaPlayer} />
+
+      <RangeControls
+        rangeStart={rangeStart}
+        rangeEnd={rangeEnd}
+        isRangeMode={isRangeMode}
+        isPlaying={isPlaying}
+        handleRangeButtonPress={handleRangeButtonPress}
+        handlePlayRange={handlePlayRange}
+        handleResetRange={handleResetRange}
+        handlePlayPause={handlePlayPause}
+        isRangeButtonDisabled={isRangeButtonDisabled()}
+        getRangeButtonText={getRangeButtonText}
+        getRangeDisplayText={getRangeDisplayText}
+      />
+
       <Stack.Screen options={{ title: theMedia?.title }} />
     </View>
   );
