@@ -138,6 +138,7 @@ export default function MediaPlayerScreen() {
 
   const handleSubtitlePress = () => {
     if (currentSubtitle && !isRangeMode) {
+      mediaPlayer.pause();
       setRangeFromSubtitle(currentSubtitle.startTime, currentSubtitle.endTime);
     }
   };
