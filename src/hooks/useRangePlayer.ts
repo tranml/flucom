@@ -78,6 +78,19 @@ export const useRangePlayer = ({
     }
   };
 
+  // TODO: Play in range based on subtitle
+  const setRangeFromSubtitle = (startTime: number, endTime: number) => {
+    // Ignore if range mode is active
+    if (isRangeMode) return;
+
+    // Reset any existing range first
+    handleResetRange();
+
+    // Set the new range points (convert from ms to seconds)
+    setRangeStart(startTime / 1000);
+    setRangeEnd(endTime / 1000);
+  };
+
   return {
     rangeStart,
     rangeEnd,
@@ -89,5 +102,7 @@ export const useRangePlayer = ({
     getRangeButtonText,
     isRangeButtonDisabled,
     getRangeDisplayText,
+    // TODO: Play in range based on subtitle
+    setRangeFromSubtitle,
   };
 };
