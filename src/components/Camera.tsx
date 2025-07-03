@@ -22,7 +22,7 @@ export const Camera = ({ onClose }: CameraProps) => {
   }
   return (
     <View>
-      <CameraView style={styles.camera}>
+      <CameraView style={styles.camera} facing="front">
         <View style={styles.footer}>
         <Pressable style={styles.recordButton}>
             <View style={styles.recordButtonInner}></View>
