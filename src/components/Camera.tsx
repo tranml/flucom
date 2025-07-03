@@ -55,7 +55,12 @@ export const Camera = ({ onClose }: CameraProps) => {
   }
   return (
     <View>
-      <CameraView ref={cameraRef} style={styles.camera} facing="front" />
+      <CameraView
+        ref={cameraRef}
+        style={styles.camera}
+        facing="front"
+        mode="video"
+      />
       <View style={[styles.footer, isRecording && styles.footerActive]}>
         <Pressable style={[styles.recordButton]} onPress={toggleRecording}>
           <View
