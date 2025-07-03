@@ -50,6 +50,9 @@ export default function MediaPlayerScreen() {
     handleRangeLogic,
     // TODO: Play in range based on subtitle
     setRangeFromSubtitle,
+    handleResetPointA,
+    isSettingPointB,
+    handleJumpToRangeStart,
   } = useRangePlayer({
     mediaPlayer,
     currentTime,
@@ -99,10 +102,12 @@ export default function MediaPlayerScreen() {
       return;
     }
 
-    const currentSubtitle = getCurrentSubtitle(time);
-    if (currentSubtitle) {
-      console.log("currentSubtitle", currentSubtitle.text);
-    }
+    getCurrentSubtitle(time);
+
+    // const currentSubtitle = getCurrentSubtitle(time);
+    // if (currentSubtitle) {
+    //   console.log("currentSubtitle", currentSubtitle.text);
+    // }
 
     if (timeSinceLastStore < 5) return;
 
@@ -138,6 +143,7 @@ export default function MediaPlayerScreen() {
 
   const handleSubtitlePress = () => {
     if (currentSubtitle && !isRangeMode) {
+      mediaPlayer.pause();
       setRangeFromSubtitle(currentSubtitle.startTime, currentSubtitle.endTime);
     }
   };
@@ -151,10 +157,19 @@ export default function MediaPlayerScreen() {
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      <MediaPlayer mediaPlayer={mediaPlayer} />
+    <View style={{ flex: 1, justifyContent: "space-between" }}>
+      <View>
+        <MediaPlayer mediaPlayer={mediaPlayer} />
+      </View>
 
-      <TouchableOpacity onPress={handleSubtitlePress} disabled={isRangeMode}>
+      <TouchableOpacity
+        style={{
+          padding: 16,
+          alignSelf: "center",
+        }}
+        onPress={handleSubtitlePress}
+        disabled={isRangeMode}
+      >
         <Text>{currentSubtitle?.text}</Text>
       </TouchableOpacity>
 
@@ -170,6 +185,9 @@ export default function MediaPlayerScreen() {
         isRangeButtonDisabled={isRangeButtonDisabled()}
         getRangeButtonText={getRangeButtonText}
         getRangeDisplayText={getRangeDisplayText}
+        isSettingPointB={isSettingPointB}
+        handleResetPointA={handleResetPointA}
+        handleJumpToRangeStart={handleJumpToRangeStart}
       />
 
       <Stack.Screen options={{ title: theMedia?.title }} />

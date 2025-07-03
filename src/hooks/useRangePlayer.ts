@@ -47,6 +47,18 @@ export const useRangePlayer = ({
     setIsSettingPointB(false);
   };
 
+  const handleResetPointA = () => {
+    mediaPlayer.currentTime = rangeStart ? rangeStart - 5 : 0;
+    setRangeStart(null);
+    setIsSettingPointB(false);
+  };
+
+  const handleJumpToRangeStart = () => {
+    if (rangeStart !== null) {
+      mediaPlayer.currentTime = rangeStart;
+    }
+  };
+
   const getRangeButtonText = (): string => {
     if (isRangeMode) return "Range Active";
     if (isSettingPointB) return "Set Point B";
@@ -104,5 +116,10 @@ export const useRangePlayer = ({
     getRangeDisplayText,
     // TODO: Play in range based on subtitle
     setRangeFromSubtitle,
+    // Reset point A
+    handleResetPointA,
+    isSettingPointB,
+    // Jump to range start (point A)
+    handleJumpToRangeStart,
   };
 };

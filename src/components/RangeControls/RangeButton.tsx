@@ -1,4 +1,6 @@
+import React from "react";
 import { TouchableOpacity, Text } from "react-native";
+import { JumpToRangeStartButton } from "./JumpToRangeStartButton";
 
 interface RangeButtonProps {
   isRangeMode: boolean;
@@ -10,6 +12,7 @@ interface RangeButtonProps {
   onPlayRange: () => void;
   isPlaying?: boolean;
   onPlayPause?: () => void;
+  handleJumpToRangeStart: () => void;
 }
 
 export const RangeButton = ({
@@ -22,9 +25,11 @@ export const RangeButton = ({
   onPlayRange,
   isPlaying,
   onPlayPause,
+  handleJumpToRangeStart,
 }: RangeButtonProps) => {
   if (isRangeMode) {
     return (
+      <>
       <TouchableOpacity
         style={{
           backgroundColor: "#007AFF",
@@ -39,6 +44,8 @@ export const RangeButton = ({
           {isPlaying ? "Pause" : "Play"}
         </Text>
       </TouchableOpacity>
+      <JumpToRangeStartButton onJumpToRangeStart={handleJumpToRangeStart} />
+      </>
     );
   }
 
