@@ -34,6 +34,14 @@
           "supportsBackgroundPlayback": true,
           "supportsPictureInPicture": true
         }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera for recording your pronunciation so you can compare with the original pronunciation",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone for recording your pronunciation so you can compare with the original pronunciation",
+          "recordAudioAndroid": true
+        }
       ]
     ]
   }
