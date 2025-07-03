@@ -16,6 +16,7 @@ import { asGetData, asStoreData } from "../../utils/handleAsyncStorage";
 import { useRangePlayer } from "../../hooks/useRangePlayer";
 import { RangeControls } from "../../components/RangeControls";
 import { SubtitleEntry } from "../../types";
+import { Camera } from "../../components/Camera";
 
 export default function MediaPlayerScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -29,6 +30,8 @@ export default function MediaPlayerScreen() {
   const [currentSubtitle, setCurrentSubtitle] = useState<SubtitleEntry | null>(
     null
   );
+
+  const [showCamera, setShowCamera] = useState<boolean>(true);
 
   const mediaPlayer = useVideoPlayer(mediaSource, (player) => {
     player.showNowPlayingNotification = true;
@@ -190,6 +193,11 @@ export default function MediaPlayerScreen() {
         handleJumpToRangeStart={handleJumpToRangeStart}
       />
 
+        {showCamera &&
+      (<View style={{ position: "absolute", bottom: 0, left: 0, right: 0, top: 0 }}>
+        <Camera />
+      </View>)
+}
       <Stack.Screen options={{ title: theMedia?.title }} />
     </View>
   );
