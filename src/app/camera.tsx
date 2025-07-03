@@ -8,13 +8,9 @@ import {
 } from "react-native";
 import { useCameraPermissions, CameraView } from "expo-camera";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import RecordedVideo from "./RecordedVideo";
+import RecordedVideo from "../components/RecordedVideo";
 
-type CameraProps = {
-  onClose: () => void;
-};
-
-export const Camera = ({ onClose }: CameraProps) => {
+export default function CameraScreen() {
   const [permission, requestPermission] = useCameraPermissions();
   const [isRecording, setIsRecording] = useState(false);
   const [videoUri, setVideoUri] = useState<string | undefined>(undefined);
@@ -73,7 +69,6 @@ export const Camera = ({ onClose }: CameraProps) => {
         size={24}
         color="white"
         style={styles.closeButton}
-        onPress={onClose}
       />
     </View>
   );
