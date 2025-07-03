@@ -193,11 +193,14 @@ export default function MediaPlayerScreen() {
         handleJumpToRangeStart={handleJumpToRangeStart}
       />
 
-        {showCamera &&
-      (<View style={{ position: "absolute", bottom: 0, left: 0, right: 0, top: 0 }}>
-        <Camera />
-      </View>)
-}
+      {showCamera && (
+        <View
+          style={{ position: "absolute", bottom: 0, left: 0, right: 0, top: 0 }}
+        >
+          <Camera onClose={() => setShowCamera(false)} />
+        </View>
+      )}
+
       <Stack.Screen options={{ title: theMedia?.title }} />
     </View>
   );
