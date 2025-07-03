@@ -2,8 +2,9 @@ import { View } from "react-native";
 import { RangeDisplay } from "./RangeDisplay";
 import { RangeButton } from "./RangeButton";
 import { ResetButton } from "./ResetButton";
+import { ResetPointAButton } from "./ResetPointAButton";
 
-interface RangeControlsProps {
+type RangeControlsProps = {
   rangeStart: number | null;
   rangeEnd: number | null;
   isRangeMode: boolean;
@@ -15,6 +16,8 @@ interface RangeControlsProps {
   isRangeButtonDisabled: boolean;
   getRangeButtonText: () => string;
   getRangeDisplayText: () => string;
+  isSettingPointB: boolean;
+  handleResetPointA: () => void;
 }
 
 export const RangeControls = ({
@@ -29,6 +32,8 @@ export const RangeControls = ({
   isRangeButtonDisabled,
   getRangeButtonText,
   getRangeDisplayText,
+  isSettingPointB,
+  handleResetPointA,
 }: RangeControlsProps) => {
   return (
     <View style={{ padding: 16, gap: 12 }}>
@@ -45,6 +50,11 @@ export const RangeControls = ({
         isPlaying={isPlaying}
         onPlayPause={handlePlayPause}
       />
+
+      {/* Show Reset Point A button when setting point B */}
+      {isSettingPointB && (
+        <ResetPointAButton onResetPointA={handleResetPointA} />
+      )}
       
       <ResetButton
         rangeStart={rangeStart}

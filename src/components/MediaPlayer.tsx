@@ -15,7 +15,7 @@ export default function MediaPlayer({ mediaPlayer }: MediaPlayerProps) {
   const [isLoading, setIsLoading] = useState(true);
 
   return (
-    <View style={styles.container}>
+    <View>
       {isLoading && (
         <ImageBackground
           source={require("../../assets/video-placeholder.png")}
@@ -34,9 +34,9 @@ export default function MediaPlayer({ mediaPlayer }: MediaPlayerProps) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  // container: {
+  //   flex: 1,
+  // },
   imageBackground: {
     justifyContent: "center",
     opacity: 0.6,
