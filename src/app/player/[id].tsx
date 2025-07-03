@@ -1,11 +1,5 @@
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { Link, Stack } from "expo-router";
+import { Text, TouchableOpacity, View } from "react-native";
+import { Stack } from "expo-router";
 import { useVideoPlayer } from "expo-video";
 import MediaPlayer from "../../components/MediaPlayer";
 
@@ -22,7 +16,6 @@ import { asGetData, asStoreData } from "../../utils/handleAsyncStorage";
 import { useRangePlayer } from "../../hooks/useRangePlayer";
 import { RangeControls } from "../../components/RangeControls";
 import { SubtitleEntry } from "../../types";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export default function MediaPlayerScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -197,26 +190,7 @@ export default function MediaPlayerScreen() {
         handleJumpToRangeStart={handleJumpToRangeStart}
       />
 
-      {!isPlaying && (
-        <Link href="/camera" asChild>
-          <Pressable style={styles.floatingButton}>
-            <MaterialIcons name="photo-camera" size={30} color="white" />
-          </Pressable>
-        </Link>
-      )}
-
       <Stack.Screen options={{ title: theMedia?.title }} />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  floatingButton: {
-    backgroundColor: "#007AFF",
-    padding: 14,
-    borderRadius: 50,
-    position: "absolute",
-    bottom: 20,
-    right: 20,
-  },
-});
