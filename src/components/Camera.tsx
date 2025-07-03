@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { useCameraPermissions, CameraView } from "expo-camera";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import RecordedVideo from "./RecordedVideo";
 
 type CameraProps = {
   onClose: () => void;
@@ -47,11 +48,7 @@ export const Camera = ({ onClose }: CameraProps) => {
   };
 
   if (videoUri) {
-    return (
-      <View>
-        <Text>{videoUri}</Text>
-      </View>
-    );
+    return <RecordedVideo videoUri={videoUri} />;
   }
   return (
     <View>
