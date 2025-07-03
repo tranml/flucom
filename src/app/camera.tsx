@@ -1,11 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import {
-  StyleSheet,
-  ActivityIndicator,
-  View,
-  Pressable,
-  Text,
-} from "react-native";
+import { StyleSheet, ActivityIndicator, View, Pressable } from "react-native";
 import { useCameraPermissions, CameraView } from "expo-camera";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import RecordedVideo from "../components/RecordedVideo";
@@ -30,7 +24,7 @@ export default function CameraScreen() {
     if (isRecording) {
       setIsRecording(false);
       cameraRef.current?.stopRecording();
-      console.log("stopRecording: ", videoUri);
+      // console.log("stopRecording: ", videoUri);
       return;
     }
 
@@ -38,14 +32,23 @@ export default function CameraScreen() {
     const result = await cameraRef.current?.recordAsync({
       maxDuration: 10,
     });
-    console.log("startRecording: ", result?.uri);
+    // console.log("startRecording: ", result?.uri);
     setVideoUri(result?.uri);
     setIsRecording(false);
   };
 
+  const closeRecordedVideoView = () => {
+    setVideoUri(undefined);
+  };
+
   if (videoUri) {
-    return <RecordedVideo videoUri={videoUri} />;
+    return (
+      <View style={{ flex: 1 }}>
+        <RecordedVideo videoUri={videoUri} onClose={closeRecordedVideoView} />
+      </View>
+    );
   }
+
   return (
     <View>
       <CameraView
@@ -64,15 +67,15 @@ export default function CameraScreen() {
           ></View>
         </Pressable>
       </View>
-      <MaterialIcons
+      {/* <MaterialIcons
         name="close"
         size={24}
         color="white"
         style={styles.closeButton}
-      />
+      /> */}
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   message: {
@@ -99,15 +102,15 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "white",
   },
-  closeButton: {
-    position: "absolute",
-    top: 20,
-    left: 20,
-    borderRadius: 25,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    padding: 5,
-    zIndex: 1000,
-  },
+  // closeButton: {
+  //   position: "absolute",
+  //   top: 20,
+  //   left: 20,
+  //   borderRadius: 25,
+  //   backgroundColor: "rgba(0, 0, 0, 0.5)",
+  //   padding: 5,
+  //   zIndex: 1000,
+  // },
   footer: {
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     padding: 20,
