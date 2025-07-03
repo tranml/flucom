@@ -48,9 +48,15 @@ export const useRangePlayer = ({
   };
 
   const handleResetPointA = () => {
-    mediaPlayer.currentTime = rangeStart ? rangeStart - 5: 0;
+    mediaPlayer.currentTime = rangeStart ? rangeStart - 5 : 0;
     setRangeStart(null);
     setIsSettingPointB(false);
+  };
+
+  const handleJumpToRangeStart = () => {
+    if (rangeStart !== null) {
+      mediaPlayer.currentTime = rangeStart;
+    }
   };
 
   const getRangeButtonText = (): string => {
@@ -113,5 +119,7 @@ export const useRangePlayer = ({
     // Reset point A
     handleResetPointA,
     isSettingPointB,
+    // Jump to range start (point A)
+    handleJumpToRangeStart,
   };
 };

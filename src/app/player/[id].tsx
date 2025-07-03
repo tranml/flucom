@@ -52,6 +52,7 @@ export default function MediaPlayerScreen() {
     setRangeFromSubtitle,
     handleResetPointA,
     isSettingPointB,
+    handleJumpToRangeStart,
   } = useRangePlayer({
     mediaPlayer,
     currentTime,
@@ -186,6 +187,7 @@ export default function MediaPlayerScreen() {
         getRangeDisplayText={getRangeDisplayText}
         isSettingPointB={isSettingPointB}
         handleResetPointA={handleResetPointA}
+        handleJumpToRangeStart={handleJumpToRangeStart}
       />
 
       <Stack.Screen options={{ title: theMedia?.title }} />

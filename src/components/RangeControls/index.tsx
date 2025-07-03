@@ -18,6 +18,7 @@ type RangeControlsProps = {
   getRangeDisplayText: () => string;
   isSettingPointB: boolean;
   handleResetPointA: () => void;
+  handleJumpToRangeStart: () => void;
 }
 
 export const RangeControls = ({
@@ -34,6 +35,7 @@ export const RangeControls = ({
   getRangeDisplayText,
   isSettingPointB,
   handleResetPointA,
+  handleJumpToRangeStart,
 }: RangeControlsProps) => {
   return (
     <View style={{ padding: 16, gap: 12 }}>
@@ -49,6 +51,7 @@ export const RangeControls = ({
         onPlayRange={handlePlayRange}
         isPlaying={isPlaying}
         onPlayPause={handlePlayPause}
+        handleJumpToRangeStart={handleJumpToRangeStart}
       />
 
       {/* Show Reset Point A button when setting point B */}
