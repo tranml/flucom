@@ -17,29 +17,41 @@ import { useRangePlayer } from "../../hooks/useRangePlayer";
 import { RangeControls } from "../../components/RangeControls";
 import { SubtitleEntry } from "../../types";
 
+import { getAllSessions } from "../../utils/handleAsyncStorage";
+
 // Helper function to get today's date key in user's timezone
 const getTodayKey = () => {
   const today = new Date();
   const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0'); // January is 0, so add 1
-  const day = String(today.getDate()).padStart(2, '0');
+  const month = String(today.getMonth() + 1).padStart(2, "0"); // January is 0, so add 1
+  const day = String(today.getDate()).padStart(2, "0");
   return `video-sessions-${year}-${month}-${day}`; // Format: YYYY-MM-DD in local timezone
 };
 
 // Helper function to save session to AsyncStorage
-const saveSession = async (videoId: string, session: {
-  startTime: number;
-  endTime: number;
-  duration: number;
-}) => {
+const saveSession = async (
+  videoId: string,
+  session: {
+    startTime: number;
+    endTime: number;
+    duration: number;
+  }
+) => {
   try {
     const dateKey = getTodayKey();
-    const existingSessions = await asGetData(dateKey) || [];
-    const updatedSessions = [...existingSessions, { 
-      videoId, 
-      ...session, 
-      timestamp: Date.now() 
-    }];
+    const existingSessionsData = await asGetData(dateKey);
+    const existingSessions = existingSessionsData
+      ? JSON.parse(existingSessionsData)
+      : [];
+
+    const updatedSessions = [
+      ...existingSessions,
+      {
+        videoId,
+        ...session,
+        timestamp: Date.now(),
+      },
+    ];
     await asStoreData(dateKey, JSON.stringify(updatedSessions));
     console.log(`[Video ${videoId}] Session saved to storage for ${dateKey}`);
   } catch (error) {
@@ -208,6 +220,20 @@ export default function MediaPlayerScreen() {
       }
     });
   }, [id, mediaPlayer]);
+
+  // Example: Load all sessions when component mounts
+  useEffect(() => {
+    const loadSessions = async () => {
+      const sessions = await getAllSessions();
+      console.log("All historical sessions:", sessions);
+
+      // Example: Get sessions for current video
+      const currentVideoSessions = sessions.filter((s) => s.videoId === id);
+      console.log(`Sessions for video ${id}:`, currentVideoSessions);
+    };
+
+    loadSessions();
+  }, [id]);
 
   const getLocalMediaPath = (id: string) => {
     return FileSystem.documentDirectory + id + ".mp4";
