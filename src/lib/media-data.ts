@@ -1,7 +1,7 @@
 import { Media, LessonSet, Course } from "../types";
 import path from "path";
 
-import { subtitle2, subtitle3, subtitle4, subtitle5 } from "./subtitle-data";
+import { subtitle2, subtitle3, subtitle4, subtitle5, subtitle6 } from "./subtitle-data";
 
 export const media: Media[] = [
   {
@@ -57,6 +57,17 @@ export const media: Media[] = [
     createdAt: "2025-07-04T00:00:00.000Z",
     updatedAt: "2025-07-04T00:00:00.000Z",
     subtitles: subtitle5,
+  },
+  {
+    id: "6",
+    title: "TH's at the Beginning of Words (unvoiced) (Part 3 of 3)",
+    slug: "ths-at-the-beginning-of-words-unvoiced-part-3-of-3",
+    url: "https://res.cloudinary.com/dqssqzt3y/video/upload/v1748738871/unit-3--part-3-of-3_k8ypad.mp4",
+    lessonSetId: "3",
+    order: 3,
+    createdAt: "2025-07-04T00:00:00.000Z",
+    updatedAt: "2025-07-04T00:00:00.000Z",
+    subtitles: subtitle6,
   },
 ];
 
