@@ -35,7 +35,8 @@ export default function MediaPlayerScreen() {
     null
   );
 
-  const [triggerFromSubtitlePress, setTriggerFromSubtitlePress] = useState<boolean>(false);
+  const [triggerFromSubtitlePress, setTriggerFromSubtitlePress] =
+    useState<boolean>(false);
 
   const mediaPlayer = useVideoPlayer(mediaSource, (player) => {
     player.showNowPlayingNotification = true;
@@ -116,10 +117,10 @@ export default function MediaPlayerScreen() {
 
     const timeSinceLastStore = time - lastStoredTimeRef.current;
 
-    if (lastStoredTimeRef.current > time) {
-      lastStoredTimeRef.current = time;
-      return;
-    }
+    // if (lastStoredTimeRef.current > time) {
+    //   lastStoredTimeRef.current = time;
+    //   return;
+    // }
 
     getCurrentSubtitle(time);
 
@@ -127,6 +128,11 @@ export default function MediaPlayerScreen() {
     // if (currentSubtitle) {
     //   console.log("currentSubtitle", currentSubtitle.text);
     // }
+
+    if (lastStoredTimeRef.current > time) {
+      lastStoredTimeRef.current = time;
+      return;
+    }
 
     if (timeSinceLastStore < 5) return;
 
@@ -191,7 +197,9 @@ export default function MediaPlayerScreen() {
         disabled={isRangeMode}
       >
         <Text>
-          {isRangeMode && triggerFromSubtitlePress ? frozenSubtitle?.text : currentSubtitle?.text}
+          {isRangeMode && triggerFromSubtitlePress
+            ? frozenSubtitle?.text
+            : currentSubtitle?.text}
         </Text>
       </TouchableOpacity>
 
