@@ -35,6 +35,11 @@ export default function MediaPlayerScreen() {
     }>
   >([]);
 
+  // Add refs to track current state for cleanup
+  const currentTimeRef = useRef<number>(0);
+  const playStartTimeRef = useRef<number | null>(null);
+  const isPlayingRef = useRef<boolean>(false);
+
   // Add state for caching current subtitle
   const [currentSubtitle, setCurrentSubtitle] = useState<SubtitleEntry | null>(
     null
@@ -92,6 +97,19 @@ export default function MediaPlayerScreen() {
     isPlaying: mediaPlayer.playing,
   });
 
+  // Update refs when state changes
+  useEffect(() => {
+    currentTimeRef.current = currentTime;
+  }, [currentTime]);
+
+  useEffect(() => {
+    playStartTimeRef.current = playStartTime;
+  }, [playStartTime]);
+
+  useEffect(() => {
+    isPlayingRef.current = isPlaying;
+  }, [isPlaying]);
+
   // Effect to track play/pause cycles
   useEffect(() => {
     if (isPlaying && playStartTime === null) {
@@ -120,6 +138,25 @@ export default function MediaPlayerScreen() {
       setPlayStartTime(null);
     }
   }, [isPlaying, currentTime, playStartTime, id]);
+
+  // Cleanup effect using refs
+  useEffect(() => {
+    return () => {
+      if (isPlayingRef.current && playStartTimeRef.current !== null) {
+        const duration = currentTimeRef.current - playStartTimeRef.current;
+        const newSession = {
+          startTime: playStartTimeRef.current,
+          endTime: currentTimeRef.current,
+          duration: duration,
+        };
+        console.log(
+          `[Video ${id}] Component unmounted while playing - Session ended:`,
+          newSession
+        );
+        console.log("--------------------------------");
+      }
+    };
+  }, []); // Empty dependency array - only runs on mount/unmount
 
   const lastStoredTimeRef = useRef<number>(0);
 
