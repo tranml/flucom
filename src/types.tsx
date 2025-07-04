@@ -42,3 +42,16 @@ export type SubtitleEntry = {
   translation: string;
   speaker: string;
 };
+
+// Play Time Tracking
+export type DailyPlayTime = {
+  date: string; // YYYY-MM-DD format
+  seconds: number;
+};
+
+export type PlayTimeData = {
+  videoId: string;
+  totalSeconds: number; // All-time total
+  dailyPlayTimes: DailyPlayTime[]; // Array of daily play times
+  lastUpdated: string; // ISO timestamp
+};
