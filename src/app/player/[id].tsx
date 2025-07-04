@@ -25,8 +25,15 @@ export default function MediaPlayerScreen() {
 
   const [currentTime, setCurrentTime] = useState<number>(0);
 
-   // Add state for play duration tracking
+  // Add state for play duration tracking
   const [playStartTime, setPlayStartTime] = useState<number | null>(null);
+  const [playSessions, setPlaySessions] = useState<
+    Array<{
+      startTime: number;
+      endTime: number;
+      duration: number;
+    }>
+  >([]);
 
   // Add state for caching current subtitle
   const [currentSubtitle, setCurrentSubtitle] = useState<SubtitleEntry | null>(
@@ -94,7 +101,22 @@ export default function MediaPlayerScreen() {
     } else if (!isPlaying && playStartTime !== null) {
       // Paused - calculate duration
       const duration = currentTime - playStartTime;
-      console.log(`[Video ${id}] Play session ended. Duration: ${duration.toFixed(2)}s`);
+      const newSession = {
+        startTime: playStartTime,
+        endTime: currentTime,
+        duration: duration,
+      };
+      setPlaySessions((prev) => [...prev, newSession]);
+      console.log(`[Video ${id}] Session ended:`, newSession);
+      console.log(`[Video ${id}] Total sessions: ${playSessions.length + 1}`);
+      console.log(
+        `[Video ${id}] Total viewing time: ${(
+          playSessions.reduce((sum, session) => sum + session.duration, 0) +
+          duration
+        ).toFixed(2)}s`
+      );
+      console.log("--------------------------------");
+
       setPlayStartTime(null);
     }
   }, [isPlaying, currentTime, playStartTime, id]);
