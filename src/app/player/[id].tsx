@@ -98,6 +98,9 @@ export default function MediaPlayerScreen() {
   const [triggerFromSubtitlePress, setTriggerFromSubtitlePress] =
     useState<boolean>(false);
 
+  // Add ref to track previous time for seeking detection
+  const previousTimeRef = useRef<number>(0);
+
   const mediaPlayer = useVideoPlayer(mediaSource, (player) => {
     player.showNowPlayingNotification = true;
     player.timeUpdateEventInterval = 0.5;
@@ -239,6 +242,15 @@ export default function MediaPlayerScreen() {
         `Sessions for video ${id}:`,
         JSON.stringify(currentVideoSessions, null, 2)
       );
+
+      // Get total viewing time
+      const totalTime = sessions.reduce(
+        (sum, session) => sum + session.duration,
+        0
+      );
+      console.log("Total viewing time:", totalTime);
+
+      // Get ses
     };
 
     loadSessions();
@@ -247,6 +259,27 @@ export default function MediaPlayerScreen() {
     //   console.log("All tracking sessions deleted");
     // });
   }, [id]);
+
+  // Add a separate effect to detect seeking
+  useEffect(() => {
+    if (isPlaying && playStartTime !== null) {
+      // Check if there was a sudden time jump (seeking)
+      const timeDiff = Math.abs(currentTime - previousTimeRef.current);
+
+      // If jump is more than 2 seconds, consider it seeking
+      if (timeDiff > 2) {
+        setPlayStartTime(currentTime);
+        console.log(
+          `[Video ${id}] Seek detected, new play start: ${currentTime.toFixed(
+            2
+          )}s`
+        );
+      }
+
+      // Update previous time for next comparison
+      previousTimeRef.current = currentTime;
+    }
+  }, [currentTime, isPlaying, playStartTime, id]);
 
   const getLocalMediaPath = (id: string) => {
     return FileSystem.documentDirectory + id + ".mp4";
