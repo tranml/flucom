@@ -11,11 +11,16 @@ import { media } from "../../lib/media-data";
 
 import { useLocalSearchParams } from "expo-router";
 
-import { asGetData, asStoreData } from "../../utils/handleAsyncStorage";
+import {
+  asGetData,
+  asStoreData,
+  storePlayTime,
+  getPlayTime,
+} from "../../utils/handleAsyncStorage";
 
 import { useRangePlayer } from "../../hooks/useRangePlayer";
 import { RangeControls } from "../../components/RangeControls";
-import { SubtitleEntry } from "../../types";
+import { PlayTimeData, SubtitleEntry } from "../../types";
 
 export default function MediaPlayerScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -37,6 +42,12 @@ export default function MediaPlayerScreen() {
 
   const [triggerFromSubtitlePress, setTriggerFromSubtitlePress] =
     useState<boolean>(false);
+
+  // Play time tracking state
+  const [playTimeData, setPlayTimeData] = useState<PlayTimeData | null>(null);
+  const playStartTimeRef = useRef<number | null>(null);
+  const accumulatedPlayTimeRef = useRef<number>(0);
+  const lastSaveTimeRef = useRef<number>(0);
 
   const mediaPlayer = useVideoPlayer(mediaSource, (player) => {
     player.showNowPlayingNotification = true;
@@ -83,6 +94,80 @@ export default function MediaPlayerScreen() {
   });
 
   const lastStoredTimeRef = useRef<number>(0);
+
+
+  // Play time tracking
+  // implementation
+  // ---
+  // Load existing play time data when component mounts
+  useEffect(() => {
+    const loadPlayTimeData = async () => {
+      if (!id) return;
+      
+      const existingData = await getPlayTime(id);
+      if (existingData) {
+        setPlayTimeData(existingData);
+        accumulatedPlayTimeRef.current = existingData.totalSeconds;
+      }
+    };
+
+    loadPlayTimeData();
+  }, [id]);
+
+  // Play time tracking effect
+  useEffect(() => {
+    if (!id) return;
+
+    if (isPlaying) {
+      // Video started playing - record start time
+      playStartTimeRef.current = Date.now();
+    } else {
+      // Video stopped playing - accumulate play time
+      if (playStartTimeRef.current !== null) {
+        const playDuration = Math.floor((Date.now() - playStartTimeRef.current) / 1000);
+        accumulatedPlayTimeRef.current += playDuration;
+        playStartTimeRef.current = null;
+        
+        // Save play time immediately when video stops
+        storePlayTime(id, playDuration);
+      }
+    }
+  }, [isPlaying, id]);
+
+  // Save play time periodically (every 30 seconds)
+  useEffect(() => {
+    if (!id || !isPlaying) return;
+
+    const saveInterval = setInterval(() => {
+      if (playStartTimeRef.current !== null) {
+        const currentPlayDuration = Math.floor((Date.now() - playStartTimeRef.current) / 1000);
+        const totalPlayDuration = accumulatedPlayTimeRef.current + currentPlayDuration;
+        
+        // Only save if we have accumulated at least 30 seconds since last save
+        if (totalPlayDuration - lastSaveTimeRef.current >= 30) {
+          const newPlayTime = totalPlayDuration - lastSaveTimeRef.current;
+          storePlayTime(id, newPlayTime);
+          lastSaveTimeRef.current = totalPlayDuration;
+        }
+      }
+    }, 30000); // Check every 30 seconds
+
+    return () => clearInterval(saveInterval);
+  }, [id, isPlaying]);
+
+  // Cleanup on component unmount
+  useEffect(() => {
+    return () => {
+      if (id && playStartTimeRef.current !== null) {
+        // Save any remaining play time when component unmounts
+        const finalPlayDuration = Math.floor((Date.now() - playStartTimeRef.current) / 1000);
+        storePlayTime(id, finalPlayDuration);
+      }
+    };
+  }, [id]);
+
+  // end of play time tracking
+  // implementation
 
   useEffect(() => {
     const mediaPath = getLocalMediaPath(id);
