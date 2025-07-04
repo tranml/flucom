@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { Media } from "../types";
+import { Media, PlayTimeData } from "../types";
 
 import {
   getCourseTitleFromMedia,
@@ -12,12 +12,16 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { Link } from "expo-router";
 import * as FileSystem from "expo-file-system";
 import { useEffect, useState } from "react";
+import { getPlayTime, getTodayPlayTime } from "../utils/handleAsyncStorage";
+import { formatPlayTimeSummary } from "../utils/formatTime";
 
 export default function MediaCard({ media }: { media: Media }) {
   const mediaType = getMediaType(media);
 
   const [localMediaPath, setLocalMediaPath] = useState<string>("");
   const [downloadProgress, setDownloadProgress] = useState<number>(0);
+  const [playTimeData, setPlayTimeData] = useState<PlayTimeData | null>(null);
+  const [todayPlayTime, setTodayPlayTime] = useState<number>(0);
 
   useEffect(() => {
     isDownloaded(media).then((isDownloaded) => {
@@ -26,6 +30,22 @@ export default function MediaCard({ media }: { media: Media }) {
       }
     });
   }, [media]);
+
+  // Load play time data
+  useEffect(() => {
+    const loadPlayTimeData = async () => {
+      const data = await getPlayTime(media.id);
+      if (data) {
+        setPlayTimeData(data);
+      }
+
+      const todayTime = await getTodayPlayTime(media.id);
+      setTodayPlayTime(todayTime);
+    };
+
+    loadPlayTimeData();
+    console.log("playTimeData", playTimeData);
+  }, [media.id]);
 
   const downloadMedia = async () => {
     console.log("downloading media");
@@ -83,6 +103,16 @@ export default function MediaCard({ media }: { media: Media }) {
         <MaterialIcons name="collections-bookmark" size={24} color="black" />
         <Text style={styles.courseTitle}>{getCourseTitleFromMedia(media)}</Text>
       </View>
+
+      {/* Play Time Display */}
+      {playTimeData && playTimeData.totalSeconds > 0 && (
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+          <MaterialIcons name="access-time" size={20} color="#666" />
+          <Text style={styles.playTimeText}>
+            {formatPlayTimeSummary(playTimeData.totalSeconds, todayPlayTime)}
+          </Text>
+        </View>
+      )}
 
       <View style={styles.row}>
         <View style={styles.badge}>
@@ -178,5 +208,10 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: "bold",
     color: "#333",
+  },
+  playTimeText: {
+    fontSize: 12,
+    color: "#666",
+    fontStyle: "italic",
   },
 });

@@ -21,6 +21,8 @@ import {
 import { useRangePlayer } from "../../hooks/useRangePlayer";
 import { RangeControls } from "../../components/RangeControls";
 import { PlayTimeData, SubtitleEntry } from "../../types";
+import { formatPlayTimeSummary } from "../../utils/formatTime";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export default function MediaPlayerScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -45,6 +47,7 @@ export default function MediaPlayerScreen() {
 
   // Play time tracking state
   const [playTimeData, setPlayTimeData] = useState<PlayTimeData | null>(null);
+  const [todayPlayTime, setTodayPlayTime] = useState<number>(0);
   const playStartTimeRef = useRef<number | null>(null);
   const accumulatedPlayTimeRef = useRef<number>(0);
   const lastSaveTimeRef = useRef<number>(0);
@@ -95,15 +98,14 @@ export default function MediaPlayerScreen() {
 
   const lastStoredTimeRef = useRef<number>(0);
 
-
   // Play time tracking
   // implementation
-  // ---
+  //--------------------------------
   // Load existing play time data when component mounts
   useEffect(() => {
     const loadPlayTimeData = async () => {
       if (!id) return;
-      
+
       const existingData = await getPlayTime(id);
       if (existingData) {
         setPlayTimeData(existingData);
@@ -124,10 +126,12 @@ export default function MediaPlayerScreen() {
     } else {
       // Video stopped playing - accumulate play time
       if (playStartTimeRef.current !== null) {
-        const playDuration = Math.floor((Date.now() - playStartTimeRef.current) / 1000);
+        const playDuration = Math.floor(
+          (Date.now() - playStartTimeRef.current) / 1000
+        );
         accumulatedPlayTimeRef.current += playDuration;
         playStartTimeRef.current = null;
-        
+
         // Save play time immediately when video stops
         storePlayTime(id, playDuration);
       }
@@ -140,9 +144,12 @@ export default function MediaPlayerScreen() {
 
     const saveInterval = setInterval(() => {
       if (playStartTimeRef.current !== null) {
-        const currentPlayDuration = Math.floor((Date.now() - playStartTimeRef.current) / 1000);
-        const totalPlayDuration = accumulatedPlayTimeRef.current + currentPlayDuration;
-        
+        const currentPlayDuration = Math.floor(
+          (Date.now() - playStartTimeRef.current) / 1000
+        );
+        const totalPlayDuration =
+          accumulatedPlayTimeRef.current + currentPlayDuration;
+
         // Only save if we have accumulated at least 30 seconds since last save
         if (totalPlayDuration - lastSaveTimeRef.current >= 30) {
           const newPlayTime = totalPlayDuration - lastSaveTimeRef.current;
@@ -160,7 +167,9 @@ export default function MediaPlayerScreen() {
     return () => {
       if (id && playStartTimeRef.current !== null) {
         // Save any remaining play time when component unmounts
-        const finalPlayDuration = Math.floor((Date.now() - playStartTimeRef.current) / 1000);
+        const finalPlayDuration = Math.floor(
+          (Date.now() - playStartTimeRef.current) / 1000
+        );
         storePlayTime(id, finalPlayDuration);
       }
     };
@@ -271,6 +280,26 @@ export default function MediaPlayerScreen() {
     <View style={{ flex: 1, justifyContent: "space-between" }}>
       <View>
         <MediaPlayer mediaPlayer={mediaPlayer} />
+
+        {/* Play Time Display */}
+        {playTimeData && playTimeData.totalSeconds > 0 && (
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 8,
+              padding: 16,
+              backgroundColor: "#f8f8f8",
+              marginHorizontal: 16,
+              borderRadius: 8,
+            }}
+          >
+            <MaterialIcons name="access-time" size={20} color="#666" />
+            <Text style={{ fontSize: 14, color: "#666" }}>
+              {formatPlayTimeSummary(playTimeData.totalSeconds, todayPlayTime)}
+            </Text>
+          </View>
+        )}
       </View>
 
       <TouchableOpacity
