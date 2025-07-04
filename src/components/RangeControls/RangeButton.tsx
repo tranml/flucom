@@ -1,6 +1,14 @@
 import React from "react";
-import { TouchableOpacity, Text } from "react-native";
+import {
+  TouchableOpacity,
+  Text,
+  View,
+  Pressable,
+  StyleSheet,
+} from "react-native";
 import { JumpToRangeStartButton } from "./JumpToRangeStartButton";
+import { Link } from "expo-router";
+import { MaterialIcons } from "@expo/vector-icons";
 
 interface RangeButtonProps {
   isRangeMode: boolean;
@@ -30,21 +38,37 @@ export const RangeButton = ({
   if (isRangeMode) {
     return (
       <>
-      <TouchableOpacity
-        style={{
-          backgroundColor: "#007AFF",
-          padding: 12,
-          borderRadius: 8,
-          alignItems: "center",
-          flex: 1,
-        }}
-        onPress={onPlayPause}
-      >
-        <Text style={{ color: "white", fontWeight: "bold" }}>
-          {isPlaying ? "Pause" : "Play"}
-        </Text>
-      </TouchableOpacity>
-      <JumpToRangeStartButton onJumpToRangeStart={handleJumpToRangeStart} />
+        <View
+          style={{
+            flexDirection: "row",
+            gap: 10,
+            justifyContent: "space-between",
+          }}
+        >
+          {!isPlaying && (
+            <Link href="/camera" asChild>
+              <Pressable style={styles.cameraButton}>
+                <MaterialIcons name="photo-camera" size={30} color="white" />
+              </Pressable>
+            </Link>
+          )}
+
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#007AFF",
+              padding: 12,
+              borderRadius: 8,
+              alignItems: "center",
+              flex: 1,
+            }}
+            onPress={onPlayPause}
+          >
+            <Text style={{ color: "white", fontWeight: "bold" }}>
+              {isPlaying ? "Pause" : "Play"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <JumpToRangeStartButton onJumpToRangeStart={handleJumpToRangeStart} />
       </>
     );
   }
@@ -66,3 +90,13 @@ export const RangeButton = ({
     </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  cameraButton: {
+    backgroundColor: "#007AFF",
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    flex: 1,
+  },
+});
