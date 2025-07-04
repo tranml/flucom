@@ -17,6 +17,36 @@ import { useRangePlayer } from "../../hooks/useRangePlayer";
 import { RangeControls } from "../../components/RangeControls";
 import { SubtitleEntry } from "../../types";
 
+// Helper function to get today's date key in user's timezone
+const getTodayKey = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0'); // January is 0, so add 1
+  const day = String(today.getDate()).padStart(2, '0');
+  return `video-sessions-${year}-${month}-${day}`; // Format: YYYY-MM-DD in local timezone
+};
+
+// Helper function to save session to AsyncStorage
+const saveSession = async (videoId: string, session: {
+  startTime: number;
+  endTime: number;
+  duration: number;
+}) => {
+  try {
+    const dateKey = getTodayKey();
+    const existingSessions = await asGetData(dateKey) || [];
+    const updatedSessions = [...existingSessions, { 
+      videoId, 
+      ...session, 
+      timestamp: Date.now() 
+    }];
+    await asStoreData(dateKey, JSON.stringify(updatedSessions));
+    console.log(`[Video ${videoId}] Session saved to storage for ${dateKey}`);
+  } catch (error) {
+    console.error(`[Video ${videoId}] Failed to save session:`, error);
+  }
+};
+
 export default function MediaPlayerScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const theMedia = media.find((m) => m.id === id);
@@ -135,6 +165,9 @@ export default function MediaPlayerScreen() {
       );
       console.log("--------------------------------");
 
+      // Save session to AsyncStorage
+      saveSession(id, newSession);
+
       setPlayStartTime(null);
     }
   }, [isPlaying, currentTime, playStartTime, id]);
@@ -154,6 +187,9 @@ export default function MediaPlayerScreen() {
           newSession
         );
         console.log("--------------------------------");
+
+        // Save session to AsyncStorage
+        saveSession(id, newSession);
       }
     };
   }, []); // Empty dependency array - only runs on mount/unmount
