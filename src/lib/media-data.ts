@@ -1,7 +1,7 @@
 import { Media, LessonSet, Course } from "../types";
 import path from "path";
 
-import { subtitle2, subtitle3 } from "./subtitle-data";
+import { subtitle2, subtitle3, subtitle4 } from "./subtitle-data";
 
 export const media: Media[] = [
   {
@@ -36,8 +36,19 @@ export const media: Media[] = [
     updatedAt: "2025-06-29T00:00:00.000Z",
     subtitles: subtitle3,
   },
-];
+  {
+    id: "4",
+    title: "TH's at the Beginning of Words (unvoiced) (Part 1 of 4)",
+    slug: "ths-at-the-beginning-of-words-unvoiced-part-1-of-4",
+    url: "https://res.cloudinary.com/dqssqzt3y/video/upload/v1748181684/unit-3--part-1-of-3_eyhq47.mp4",
+    lessonSetId: "3",
+    order: 1,
+    createdAt: "2025-07-04T00:00:00.000Z",
+    updatedAt: "2025-07-04T00:00:00.000Z",
+    subtitles: subtitle4,
 
+  },
+];
 
 export const lessonSets: LessonSet[] = [
   {
@@ -54,9 +65,18 @@ export const lessonSets: LessonSet[] = [
     title: "Unit 4: Hidden Y Sounds",
     slug: "unit-4-hidden-y-sounds",
     courseId: "2",
-    order: 1,
+    order: 4,
     createdAt: "2025-06-29T00:00:00.000Z",
     updatedAt: "2025-06-29T00:00:00.000Z",
+  },
+  {
+    id: "3",
+    title: "Unit 3: TH's at the Beginning of Words",
+    slug: "unit-3-ths-at-the-beginning-of-words",
+    courseId: "2",
+    order: 3,
+    createdAt: "2025-07-04T00:00:00.000Z",
+    updatedAt: "2025-07-04T00:00:00.000Z",
   },
 ];
 

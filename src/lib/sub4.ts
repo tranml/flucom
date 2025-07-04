@@ -1,4 +1,6 @@
-export const sub4 = [
+import { SubtitleEntry } from "../types";
+
+export const sub4: SubtitleEntry[] = [
   {
     endTime: 58862,
     id: 1,
@@ -371,7 +373,7 @@ export const sub4 = [
     endTime: 216664,
     id: 40,
     phonetic: "wɛr jʊr ˈædɪŋ ə ˈlɪtl̩ ti saʊnd ɪn ðɛr",
-    speakerr: "none",
+    speaker: "none",
     startTime: 214303,
     text: "where you're adding a little t sound in there.",
     translation: 'nơi bạn thêm một âm "t" nhỏ vào trong đó.',
