@@ -42,6 +42,14 @@
           "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone for recording your pronunciation so you can compare with the original pronunciation",
           "recordAudioAndroid": true
         }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos.",
+          "savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos.",
+          "isAccessMediaLocationEnabled": true
+        }
       ]
     ]
   }
