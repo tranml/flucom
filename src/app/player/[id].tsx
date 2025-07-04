@@ -17,6 +17,51 @@ import { useRangePlayer } from "../../hooks/useRangePlayer";
 import { RangeControls } from "../../components/RangeControls";
 import { SubtitleEntry } from "../../types";
 
+import {
+  deleteAllSessions,
+  getAllSessions,
+} from "../../utils/handleAsyncStorage";
+
+// Helper function to get today's date key in user's timezone
+const getTodayKey = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0"); // January is 0, so add 1
+  const day = String(today.getDate()).padStart(2, "0");
+  return `video-sessions-${year}-${month}-${day}`; // Format: YYYY-MM-DD in local timezone
+};
+
+// Helper function to save session to AsyncStorage
+const saveSession = async (
+  videoId: string,
+  session: {
+    startTime: number;
+    endTime: number;
+    duration: number;
+  }
+) => {
+  try {
+    const dateKey = getTodayKey();
+    const existingSessionsData = await asGetData(dateKey);
+    const existingSessions = existingSessionsData
+      ? JSON.parse(existingSessionsData)
+      : [];
+
+    const updatedSessions = [
+      ...existingSessions,
+      {
+        videoId,
+        ...session,
+        timestamp: Date.now(),
+      },
+    ];
+    await asStoreData(dateKey, JSON.stringify(updatedSessions));
+    console.log(`[Video ${videoId}] Session saved to storage for ${dateKey}`);
+  } catch (error) {
+    console.error(`[Video ${videoId}] Failed to save session:`, error);
+  }
+};
+
 export default function MediaPlayerScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const theMedia = media.find((m) => m.id === id);
@@ -24,6 +69,21 @@ export default function MediaPlayerScreen() {
   const [mediaSource, setMediaSource] = useState<string>("");
 
   const [currentTime, setCurrentTime] = useState<number>(0);
+
+  // Add state for play duration tracking
+  const [playStartTime, setPlayStartTime] = useState<number | null>(null);
+  const [playSessions, setPlaySessions] = useState<
+    Array<{
+      startTime: number;
+      endTime: number;
+      duration: number;
+    }>
+  >([]);
+
+  // Add refs to track current state for cleanup
+  const currentTimeRef = useRef<number>(0);
+  const playStartTimeRef = useRef<number | null>(null);
+  const isPlayingRef = useRef<boolean>(false);
 
   // Add state for caching current subtitle
   const [currentSubtitle, setCurrentSubtitle] = useState<SubtitleEntry | null>(
@@ -37,6 +97,9 @@ export default function MediaPlayerScreen() {
 
   const [triggerFromSubtitlePress, setTriggerFromSubtitlePress] =
     useState<boolean>(false);
+
+  // Add ref to track previous time for seeking detection
+  const previousTimeRef = useRef<number>(0);
 
   const mediaPlayer = useVideoPlayer(mediaSource, (player) => {
     player.showNowPlayingNotification = true;
@@ -82,6 +145,73 @@ export default function MediaPlayerScreen() {
     isPlaying: mediaPlayer.playing,
   });
 
+  // Update refs when state changes
+  useEffect(() => {
+    currentTimeRef.current = currentTime;
+  }, [currentTime]);
+
+  useEffect(() => {
+    playStartTimeRef.current = playStartTime;
+  }, [playStartTime]);
+
+  useEffect(() => {
+    isPlayingRef.current = isPlaying;
+  }, [isPlaying]);
+
+  // Effect to track play/pause cycles
+  useEffect(() => {
+    if (isPlaying && playStartTime === null) {
+      // Started playing - record start time
+      setPlayStartTime(currentTime);
+      console.log(`[Video ${id}] Play started at: ${currentTime.toFixed(2)}s`);
+    } else if (!isPlaying && playStartTime !== null) {
+      // Paused - calculate duration
+      const duration = currentTime - playStartTime;
+      const newSession = {
+        startTime: playStartTime,
+        endTime: currentTime,
+        duration: duration,
+      };
+      setPlaySessions((prev) => [...prev, newSession]);
+      console.log(`[Video ${id}] Session ended:`, newSession);
+      console.log(`[Video ${id}] Total sessions: ${playSessions.length + 1}`);
+      console.log(
+        `[Video ${id}] Total viewing time: ${(
+          playSessions.reduce((sum, session) => sum + session.duration, 0) +
+          duration
+        ).toFixed(2)}s`
+      );
+      console.log("--------------------------------");
+
+      // Save session to AsyncStorage
+      saveSession(id, newSession);
+
+      setPlayStartTime(null);
+    }
+  }, [isPlaying, currentTime, playStartTime, id]);
+
+  // Cleanup effect using refs
+  useEffect(() => {
+    return () => {
+      if (isPlayingRef.current && playStartTimeRef.current !== null) {
+        const duration = currentTimeRef.current - playStartTimeRef.current;
+        const newSession = {
+          startTime: playStartTimeRef.current,
+          endTime: currentTimeRef.current,
+          duration: duration,
+        };
+        console.log(
+          `[Video ${id}] Component unmounted while playing - Session ended:`,
+          newSession
+        );
+        console.log("--------------------------------");
+
+        // Save session to AsyncStorage
+        saveSession(id, newSession);
+      }
+    };
+  }, []); // Empty dependency array - only runs on mount/unmount
+
   const lastStoredTimeRef = useRef<number>(0);
 
   useEffect(() => {
@@ -96,6 +226,60 @@ export default function MediaPlayerScreen() {
       }
     });
   }, [id, mediaPlayer]);
+
+  // Example: Load all sessions when component mounts
+  useEffect(() => {
+    const loadSessions = async () => {
+      const sessions = await getAllSessions();
+      console.log(
+        "All historical sessions:",
+        JSON.stringify(sessions, null, 2)
+      );
+
+      // Example: Get sessions for current video
+      const currentVideoSessions = sessions.filter((s) => s.videoId === id);
+      console.log(
+        `Sessions for video ${id}:`,
+        JSON.stringify(currentVideoSessions, null, 2)
+      );
+
+      // Get total viewing time
+      const totalTime = sessions.reduce(
+        (sum, session) => sum + session.duration,
+        0
+      );
+      console.log("Total viewing time:", totalTime);
+
+      // Get ses
+    };
+
+    loadSessions();
+
+    // deleteAllSessions().then(() => {
+    //   console.log("All tracking sessions deleted");
+    // });
+  }, [id]);
+
+  // Add a separate effect to detect seeking
+  useEffect(() => {
+    if (isPlaying && playStartTime !== null) {
+      // Check if there was a sudden time jump (seeking)
+      const timeDiff = Math.abs(currentTime - previousTimeRef.current);
+
+      // If jump is more than 2 seconds, consider it seeking
+      if (timeDiff > 2) {
+        setPlayStartTime(currentTime);
+        console.log(
+          `[Video ${id}] Seek detected, new play start: ${currentTime.toFixed(
+            2
+          )}s`
+        );
+      }
+
+      // Update previous time for next comparison
+      previousTimeRef.current = currentTime;
+    }
+  }, [currentTime, isPlaying, playStartTime, id]);
 
   const getLocalMediaPath = (id: string) => {
     return FileSystem.documentDirectory + id + ".mp4";
