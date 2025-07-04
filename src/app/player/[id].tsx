@@ -35,6 +35,8 @@ export default function MediaPlayerScreen() {
     null
   );
 
+  const [triggerFromSubtitlePress, setTriggerFromSubtitlePress] = useState<boolean>(false);
+
   const mediaPlayer = useVideoPlayer(mediaSource, (player) => {
     player.showNowPlayingNotification = true;
     player.timeUpdateEventInterval = 0.5;
@@ -65,14 +67,15 @@ export default function MediaPlayerScreen() {
 
   // Effect to handle frozen subtitle when entering/exiting range mode
   useEffect(() => {
-    if (isRangeMode && !frozenSubtitle) {
+    if (isRangeMode && !frozenSubtitle && triggerFromSubtitlePress) {
       // When entering range mode, freeze the current subtitle
       setFrozenSubtitle(currentSubtitle);
     } else if (!isRangeMode && frozenSubtitle) {
       // When exiting range mode, clear the frozen subtitle
       setFrozenSubtitle(null);
+      setTriggerFromSubtitlePress(false);
     }
-  }, [isRangeMode, currentSubtitle, frozenSubtitle]);
+  }, [isRangeMode, currentSubtitle, frozenSubtitle, triggerFromSubtitlePress]);
 
   const { isPlaying } = useEvent(mediaPlayer, "playingChange", {
     isPlaying: mediaPlayer.playing,
@@ -161,6 +164,7 @@ export default function MediaPlayerScreen() {
     if (currentSubtitle && !isRangeMode) {
       mediaPlayer.pause();
       setRangeFromSubtitle(currentSubtitle.startTime, currentSubtitle.endTime);
+      setTriggerFromSubtitlePress(true);
     }
   };
 
@@ -187,7 +191,7 @@ export default function MediaPlayerScreen() {
         disabled={isRangeMode}
       >
         <Text>
-          {isRangeMode ? frozenSubtitle?.text : currentSubtitle?.text}
+          {isRangeMode && triggerFromSubtitlePress ? frozenSubtitle?.text : currentSubtitle?.text}
         </Text>
       </TouchableOpacity>
 
