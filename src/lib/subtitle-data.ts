@@ -1,5 +1,6 @@
 import { SubtitleEntry } from "../types";
 import { sub4 } from "../lib/sub4";
+import { sub5 } from "../lib/sub5";
 
 export const subtitle2: SubtitleEntry[] = [
   {
@@ -650,3 +651,4 @@ export const subtitle3: SubtitleEntry[] = [
 ];
 
 export const subtitle4: SubtitleEntry[] = [...sub4];
+export const subtitle5: SubtitleEntry[] = [...sub5];
