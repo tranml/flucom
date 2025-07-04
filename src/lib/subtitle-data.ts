@@ -1,4 +1,7 @@
 import { SubtitleEntry } from "../types";
+import { sub4 } from "../lib/sub4";
+import { sub5 } from "../lib/sub5";
+import { sub6 } from "./sub6";
 
 export const subtitle2: SubtitleEntry[] = [
   {
@@ -647,3 +650,7 @@ export const subtitle3: SubtitleEntry[] = [
     speaker: "none",
   },
 ];
+
+export const subtitle4: SubtitleEntry[] = [...sub4];
+export const subtitle5: SubtitleEntry[] = [...sub5];
+export const subtitle6: SubtitleEntry[] = [...sub6];

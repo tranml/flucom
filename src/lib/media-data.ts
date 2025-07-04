@@ -1,7 +1,7 @@
 import { Media, LessonSet, Course } from "../types";
 import path from "path";
 
-import { subtitle2, subtitle3 } from "./subtitle-data";
+import { subtitle2, subtitle3, subtitle4, subtitle5, subtitle6 } from "./subtitle-data";
 
 export const media: Media[] = [
   {
@@ -36,8 +36,40 @@ export const media: Media[] = [
     updatedAt: "2025-06-29T00:00:00.000Z",
     subtitles: subtitle3,
   },
+  {
+    id: "4",
+    title: "TH's at the Beginning of Words (unvoiced) (Part 1 of 3)",
+    slug: "ths-at-the-beginning-of-words-unvoiced-part-1-of-3",
+    url: "https://res.cloudinary.com/dqssqzt3y/video/upload/v1748181684/unit-3--part-1-of-3_eyhq47.mp4",
+    lessonSetId: "3",
+    order: 1,
+    createdAt: "2025-07-04T00:00:00.000Z",
+    updatedAt: "2025-07-04T00:00:00.000Z",
+    subtitles: subtitle4,
+  },
+  {
+    id: "5",
+    title: "TH's at the Beginning of Words (unvoiced) (Part 2 of 3)",
+    slug: "ths-at-the-beginning-of-words-unvoiced-part-2-of-3",
+    url: "https://res.cloudinary.com/dqssqzt3y/video/upload/v1748407868/unit-3--part-2-of-3_fsfe5n.mp4",
+    lessonSetId: "3",
+    order: 2,
+    createdAt: "2025-07-04T00:00:00.000Z",
+    updatedAt: "2025-07-04T00:00:00.000Z",
+    subtitles: subtitle5,
+  },
+  {
+    id: "6",
+    title: "TH's at the Beginning of Words (unvoiced) (Part 3 of 3)",
+    slug: "ths-at-the-beginning-of-words-unvoiced-part-3-of-3",
+    url: "https://res.cloudinary.com/dqssqzt3y/video/upload/v1748738871/unit-3--part-3-of-3_k8ypad.mp4",
+    lessonSetId: "3",
+    order: 3,
+    createdAt: "2025-07-04T00:00:00.000Z",
+    updatedAt: "2025-07-04T00:00:00.000Z",
+    subtitles: subtitle6,
+  },
 ];
-
 
 export const lessonSets: LessonSet[] = [
   {
@@ -54,9 +86,18 @@ export const lessonSets: LessonSet[] = [
     title: "Unit 4: Hidden Y Sounds",
     slug: "unit-4-hidden-y-sounds",
     courseId: "2",
-    order: 1,
+    order: 4,
     createdAt: "2025-06-29T00:00:00.000Z",
     updatedAt: "2025-06-29T00:00:00.000Z",
+  },
+  {
+    id: "3",
+    title: "Unit 3: TH's at the Beginning of Words",
+    slug: "unit-3-ths-at-the-beginning-of-words",
+    courseId: "2",
+    order: 3,
+    createdAt: "2025-07-04T00:00:00.000Z",
+    updatedAt: "2025-07-04T00:00:00.000Z",
   },
 ];
 
