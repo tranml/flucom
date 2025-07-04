@@ -17,7 +17,10 @@ import { useRangePlayer } from "../../hooks/useRangePlayer";
 import { RangeControls } from "../../components/RangeControls";
 import { SubtitleEntry } from "../../types";
 
-import { getAllSessions } from "../../utils/handleAsyncStorage";
+import {
+  deleteAllSessions,
+  getAllSessions,
+} from "../../utils/handleAsyncStorage";
 
 // Helper function to get today's date key in user's timezone
 const getTodayKey = () => {
@@ -225,14 +228,24 @@ export default function MediaPlayerScreen() {
   useEffect(() => {
     const loadSessions = async () => {
       const sessions = await getAllSessions();
-      console.log("All historical sessions:", sessions);
+      console.log(
+        "All historical sessions:",
+        JSON.stringify(sessions, null, 2)
+      );
 
       // Example: Get sessions for current video
       const currentVideoSessions = sessions.filter((s) => s.videoId === id);
-      console.log(`Sessions for video ${id}:`, currentVideoSessions);
+      console.log(
+        `Sessions for video ${id}:`,
+        JSON.stringify(currentVideoSessions, null, 2)
+      );
     };
 
     loadSessions();
+
+    // deleteAllSessions().then(() => {
+    //   console.log("All tracking sessions deleted");
+    // });
   }, [id]);
 
   const getLocalMediaPath = (id: string) => {
