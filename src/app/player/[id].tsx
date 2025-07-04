@@ -25,6 +25,9 @@ export default function MediaPlayerScreen() {
 
   const [currentTime, setCurrentTime] = useState<number>(0);
 
+   // Add state for play duration tracking
+  const [playStartTime, setPlayStartTime] = useState<number | null>(null);
+
   // Add state for caching current subtitle
   const [currentSubtitle, setCurrentSubtitle] = useState<SubtitleEntry | null>(
     null
@@ -81,6 +84,20 @@ export default function MediaPlayerScreen() {
   const { isPlaying } = useEvent(mediaPlayer, "playingChange", {
     isPlaying: mediaPlayer.playing,
   });
+
+  // Effect to track play/pause cycles
+  useEffect(() => {
+    if (isPlaying && playStartTime === null) {
+      // Started playing - record start time
+      setPlayStartTime(currentTime);
+      console.log(`[Video ${id}] Play started at: ${currentTime.toFixed(2)}s`);
+    } else if (!isPlaying && playStartTime !== null) {
+      // Paused - calculate duration
+      const duration = currentTime - playStartTime;
+      console.log(`[Video ${id}] Play session ended. Duration: ${duration.toFixed(2)}s`);
+      setPlayStartTime(null);
+    }
+  }, [isPlaying, currentTime, playStartTime, id]);
 
   const lastStoredTimeRef = useRef<number>(0);
 
